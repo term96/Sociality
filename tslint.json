@@ -1,0 +1,230 @@
+{
+	"extends": ["tslint-react-recommended"],
+	"rulesDirectory": [
+		"node_modules/vrsource-tslint-rules/rules/",
+		"node_modules/tslint-consistent-codestyle/rules/",
+		"node_modules/tslint-eslint-rules/dist/rules/"
+	],
+	"rules": {
+        "ter-indent": [
+            false
+        ],
+		"linebreak-style": [
+			true,
+			"LF"
+		],
+		"quotemark": [
+			true,
+			"single",
+			"avoid-escape"
+		],
+		"trailing-comma": [
+			true,
+			{
+				"multiline": "never",
+				"singleline": "never"
+			}
+		],
+		"variable-name": [
+			true,
+			"allow-leading-underscore",
+			"allow-pascal-case"
+		],
+		"array-type": [
+			true,
+			"array"
+		],
+		"comment-format": [
+			true,
+			"check-space"
+		],
+		"member-ordering": [
+			true,
+			{
+				"order": [
+					"public-constructor",
+					"public-instance-method",
+					"public-static-method",
+					"protected-constructor",
+					"protected-instance-method",
+					"protected-static-method",
+					"private-constructor",
+					"private-instance-method",
+					"private-static-method"
+				],
+				"alphabetize": false
+			}
+		],
+		"no-console": [
+			true,
+			"log",
+			"error"
+		],
+		"eofline": true,
+		"ascii-only": false,
+		"no-collapsible-if": true,
+		"no-var-before-return": true,
+		"no-static-this": true,
+		"no-else-after-return": true,
+		"no-unnecessary-else": true,
+		"valid-typeof": true,
+		"no-multi-spaces": true,
+		"no-unexpected-multiline": true,
+		"no-constant-condition": true,
+		"no-extra-semi": true,
+		"no-duplicate-case": true,
+		"no-control-regex": true,
+		"no-empty-character-class": true,
+		"no-ex-assign": true,
+		"no-invalid-regexp": true,
+		"no-regex-spaces": true,
+		"ext-variable-name": [
+			true,
+			[
+				"class",
+				"pascal"
+			],
+			[
+				"interface",
+				"pascal",
+				{
+					"regex": "^I.*$"
+				}
+			],
+			[
+				"parameter",
+				"camel"
+			],
+			[
+				"property",
+				"private",
+				"static",
+				"camel",
+				"allow-leading-underscore"
+			],
+			[
+				"property",
+				"protected",
+				"static",
+				"camel",
+				"allow-leading-underscore"
+			],
+			[
+				"property",
+				"private",
+				"camel",
+				"allow-leading-underscore"
+			],
+			[
+				"property",
+				"protected",
+				"camel",
+				"allow-leading-underscore"
+			],
+			[
+				"property",
+				"static",
+				"camel"
+			],
+			[
+				"variable",
+				"local",
+				"camel"
+			],
+			[
+				"variable",
+				"const",
+				"camel"
+			],
+			[
+				"variable",
+				"camel"
+			],
+			[
+				"method",
+				"private",
+				"camel"
+			],
+			[
+				"method",
+				"protected",
+				"camel"
+			],
+			[
+				"function",
+				"camel"
+			],
+			[
+				"default",
+				"camel"
+			]
+		],
+		"literal-spacing": [
+			true,
+			{
+				"array": [
+					"never"
+				],
+				"object": [
+					"always"
+				],
+				"import": [
+					"always"
+				]
+			}
+		],
+		"max-params": [
+			true,
+			5
+		],
+		"no-duplicate-imports": true,
+		"prefer-literal": [
+			true,
+			"object",
+			"function",
+			"array"
+		],
+		"arrow-parens": [true, "ban-single-arg-parens"],
+		"only-arrow-functions": true,
+		"whitespace": [
+			true,
+			"check-branch",
+			"check-decl",
+			"check-operator",
+			"check-separator",
+			"check-type",
+			"check-typecast"
+		],
+		"import-spacing": true,
+		"typedef": [
+			true,
+			"call-signature",
+			"parameter",
+			"member-variable-declaration",
+			"arrow-parameter",
+			"property-declaration",
+			"variable-declaration",
+			"member-variable-declaration",
+			"object-destructuring",
+			"array-destructuring"
+		],
+		"no-submodule-imports": false,
+		"prefer-template": false,
+		"semicolon": [true, "always"],
+		"indent": [true, "tabs"],
+		"max-line-length": [true, 120],
+		"max-classes-per-file": [
+			false
+		],
+		"ban": false,
+		"callable-types": false,
+		"file-header": [
+			false
+		],
+		"prefer-for-of": false,
+		"prefer-function-over-method": false,
+		"import-blacklist": false,
+		"no-empty-interface": false,
+		"object-literal-shorthand": false
+	}
+}
