@@ -3,9 +3,9 @@ import * as bodyParser from 'body-parser';
 import JWT from './JWT';
 import DB from './DB';
 import { Result } from './Result';
-import UserModel from './models/UserModel';
+import UserModel from '../shared/models/UserModel';
 import Const from './Const';
-import JsonResponse from './JsonResponse';
+import JsonResponse from '../shared/models/JsonResponse';
 import reducers from '../shared/redux/reducers/AllReducers';
 import { Store, createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
@@ -16,6 +16,7 @@ import * as React from 'react';
 import * as ReactDOMServer from 'react-dom/server';
 import App from '../shared/components/App';
 import * as nodePath from 'path';
+import AuthState from '../shared/models/AuthState';
 
 DB.connect();
 const app: express.Express = express();
@@ -24,26 +25,25 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/assets', express.static(nodePath.resolve(__dirname, '../../public/assets')));
 
-app.post('/api/users/register', (req: express.Request, res: express.Response) => {
-	if (!req.body || !req.body.login || !req.body.password) {
-		const response: JsonResponse = new JsonResponse(Result.INVALID_BODY);
-		return res.status(response.httpCode).send(response);
+app.post('/api/users/signup', (req: express.Request, res: express.Response) => {
+	if (!req.body || !req.body.login || !req.body.password || !req.body.name || !req.body.surname) {
+		const jsonResponse: JsonResponse = new JsonResponse(Result.INVALID_BODY);
+		return res.status(jsonResponse.httpCode).send(jsonResponse);
 	}
 
-	const user: UserModel = new UserModel(undefined, req.body.login, req.body.password);
+	const user: UserModel = new UserModel(undefined, req.body.login, req.body.password, req.body.name, req.body.surname);
+
 	DB.insertUser(user, (result: Result, id?: number) => {
-		const response: JsonResponse = new JsonResponse(result);
+		const jsonResponse: JsonResponse = new JsonResponse(result);
 		if (result === Result.OK) {
-			response.body = { token: JWT.sign(id) };
+			jsonResponse.body = new AuthState(undefined, id, JWT.sign(id));
 		}
-		return res.status(response.httpCode).send(response);
+		return res.status(jsonResponse.httpCode).send(jsonResponse);
 	});
 });
 
 app.get('/api/users', (req: express.Request, res: express.Response) => {
-	res.send({
-		id: 1337
-	});
+
 });
 
 app.get('*', async (req: express.Request, res: express.Response) => {
@@ -97,7 +97,7 @@ app.get('*', async (req: express.Request, res: express.Response) => {
 			res.send(createHtml(html, preloadedState));
 		}
 	} catch (error) {
-		res.status(500).send(createHtml(`<span>Internal server error + ${error}</span>`, {}));
+		res.status(500).send(createHtml(`<span>Internal server error</span>`, {}));
 	}
 });
 

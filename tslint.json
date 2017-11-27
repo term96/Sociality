@@ -213,6 +213,7 @@
 		"semicolon": [true, "always"],
 		"indent": [true, "tabs"],
 		"max-line-length": [true, 120],
+		"align": false,
 		"max-classes-per-file": [
 			false
 		],

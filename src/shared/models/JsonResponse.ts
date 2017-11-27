@@ -1,4 +1,4 @@
-import { Result } from './Result';
+import { Result } from '../../server/Result';
 export default class JsonResponse {
 	private _status: Result;
 	private _body: Object;

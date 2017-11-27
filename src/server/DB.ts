@@ -1,4 +1,4 @@
-import UserModel from './models/UserModel';
+import UserModel from '../shared/models/UserModel';
 import { Result } from './Result';
 import * as mysql from 'mysql';
 import Const from './Const';
@@ -31,8 +31,9 @@ export default class DB {
 	}
 
 	public static insertUser(user: UserModel, callback: (result: Result, id?: number) => void): void {
-		const query: string = 'INSERT INTO user (id, login, password) VALUES (null, ?, ?)';
-		DB._connection.query(query, [user.login, user.password], (err: mysql.MysqlError | null, result: any) => {
+		const query: string = 'INSERT INTO user (id, login, password, name, surname) VALUES (null, ?, ?, ?, ?)';
+		DB._connection.query(query, [user.login, user.password, user.name, user.surname],
+			(err: mysql.MysqlError | null, result: any) => {
 			if (err) {
 				callback(Result.INTERNAL_ERROR);
 				throw err;

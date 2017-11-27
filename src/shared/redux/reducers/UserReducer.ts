@@ -5,8 +5,12 @@ export default (state: any, action: any) => {
 		return {};
 	}
 	if (action.type === ActionTypes.USER_GET_INFO) {
-		return { ...state,
+		return {
+			...state,
 			...action.payload
 		};
 	}
+	return {
+		...state
+	};
 };

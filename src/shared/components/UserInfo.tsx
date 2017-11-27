@@ -1,23 +1,27 @@
 import * as React from 'react';
+import { UserState } from '../redux/AppState';
 
 export interface IUserInfoProps {
-	userInfo: {};
+	userState: UserState;
 }
 
 export default class UserInfo extends React.Component<IUserInfoProps, {}> {
 	render(): JSX.Element {
-		const fields: JSX.Element[] = [];
-		for (const key in this.props.userInfo) {
-			if (this.props.userInfo.hasOwnProperty(key)) {
-				fields.push(<li key={key}>{this.props.userInfo[key]} {key}</li>);
-			}
+		const props: IUserInfoProps = this.props;
+
+		if (props.userState.errorNumber) {
+			return (
+				<div>
+					<span>Ошибка {props.userState.errorNumber}, попробуйте обновить страницу</span>
+				</div>
+			);
 		}
 
 		return (
 			<div>
-				<ul>
-					{fields}
-				</ul>
+				<span>Ошибки нет, но и инфы нет :(</span>
+				<span>ID: {props.userState.id}</span>
+				<span>Token: {props.userState.id}</span>
 			</div>
 		);
 	}
