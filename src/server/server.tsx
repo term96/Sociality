@@ -3,9 +3,8 @@ import * as bodyParser from 'body-parser';
 import JWT from './JWT';
 import DB from './DB';
 import { Result } from './Result';
-import UserModel from './models/UserModel';
+import UserModel from '../shared/models/UserModel';
 import Const from './Const';
-import JsonResponse from './JsonResponse';
 import reducers from '../shared/redux/reducers/AllReducers';
 import { Store, createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
@@ -16,34 +15,50 @@ import * as React from 'react';
 import * as ReactDOMServer from 'react-dom/server';
 import App from '../shared/components/App';
 import * as nodePath from 'path';
+import AuthState from '../shared/models/AuthState';
+import UserState from '../shared/models/UserState';
 
 DB.connect();
 const app: express.Express = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 app.use('/assets', express.static(nodePath.resolve(__dirname, '../../public/assets')));
 
-app.post('/api/users/register', (req: express.Request, res: express.Response) => {
-	if (!req.body || !req.body.login || !req.body.password) {
-		const response: JsonResponse = new JsonResponse(Result.INVALID_BODY);
-		return res.status(response.httpCode).send(response);
+app.post('/api/users/sign_up', (req: express.Request, res: express.Response) => {
+	if (!req.body || !req.body.login || !req.body.password || !req.body.name || !req.body.surname) {
+		const response: AuthState = new AuthState(Result.INVALID_BODY);
+		return res.json(response);
 	}
 
-	const user: UserModel = new UserModel(undefined, req.body.login, req.body.password);
+	const user: UserModel = new UserModel(undefined, req.body.login, req.body.password, req.body.name, req.body.surname);
+
 	DB.insertUser(user, (result: Result, id?: number) => {
-		const response: JsonResponse = new JsonResponse(result);
-		if (result === Result.OK) {
-			response.body = { token: JWT.sign(id) };
-		}
-		return res.status(response.httpCode).send(response);
+		const response: AuthState = (result === Result.OK)
+			? new AuthState(undefined, id, JWT.sign(id))
+			: new AuthState(result);
+		res.json(response);
 	});
 });
 
-app.get('/api/users', (req: express.Request, res: express.Response) => {
-	res.send({
-		id: 1337
+app.post('/api/users/sign_in', (req: express.Request, res: express.Response) => {
+	if (!req.body || !req.body.login || !req.body.password) {
+		const response: AuthState = new AuthState(Result.INVALID_BODY);
+		return res.json(response);
+	}
+
+	DB.getUser(req.body.login, req.body.password, (result: Result, user?: UserModel) => {
+		const response: AuthState = (result === Result.OK)
+			? new AuthState(undefined, user.id, JWT.sign(user.id))
+			: new AuthState(result);
+		res.json(response);
 	});
+});
+
+app.get('/api/users/:id', (req: express.Request, res: express.Response) => {
+	const response: UserState = new UserState(undefined, req.params.id);
+	res.json(response);
 });
 
 app.get('*', async (req: express.Request, res: express.Response) => {
@@ -88,7 +103,7 @@ app.get('*', async (req: express.Request, res: express.Response) => {
 		// check context for url, if url exists then react router has ran into a redirect
 		if (context.url) {
 			// process redirect through express by redirecting
-			res.redirect(context.status, 'http://' + req.headers.host + context.url);
+			res.redirect(context.status as number, 'http://' + req.headers.host + context.url);
 		} else if (foundPath && foundPath.path === '*') {
 			// if 404 then send our custom 404 page with initial state and meta data, this is needed for status code 404
 			res.status(404).send(createHtml(html, preloadedState));
@@ -97,7 +112,7 @@ app.get('*', async (req: express.Request, res: express.Response) => {
 			res.send(createHtml(html, preloadedState));
 		}
 	} catch (error) {
-		res.status(500).send(createHtml(`<span>Internal server error + ${error}</span>`, {}));
+		res.status(500).send(createHtml(`<span>Internal server error</span>`, {}));
 	}
 });
 

@@ -16,15 +16,9 @@
       "node_modules/@types"
     ]
   },
-  "include": [
-    "src/server/server.tsx"
-  ],
-  "exclude": [
-    "node_modules"
-  ],
   "awesomeTypescriptLoaderOptions": {
     "useBabel": true,
-    "useCache": false,
+    "useCache": true,
     "babelOptions": {
       "babelrc": false,
       "presets": ["env"]

@@ -1,3 +1,5 @@
 export const enum ActionTypes {
-	USER_GET_INFO = 'USER_GET_INFO'
+	GET_USER_INFO = 'GET_USER_INFO',
+	SIGN_UP = 'SIGN_UP',
+	SIGN_IN = 'SIGN_IN'
 }

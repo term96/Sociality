@@ -2,16 +2,16 @@ import * as jsonwebtoken from 'jsonwebtoken';
 import Const from './Const';
 
 export default class JWT {
-	public static sign(id: number): String {
+	public static sign(id: number): string {
 		return jsonwebtoken.sign({ id: id }, Const.jwtSecret, { expiresIn: '24h' });
 	}
 
-	public static decodeId(token: String): number | null {
+	public static decodeId(token: string): number {
 		try {
 			const payload: JWTPayload = jsonwebtoken.verify(token, Const.jwtSecret);
 			return payload.getId();
 		} catch (err) {
-			return null;
+			return undefined;
 		}
 	}
 }

@@ -1,19 +1,37 @@
 import * as React from 'react';
-import UserInfo from './UserInfo';
 import * as userActions from '../redux/actions/UserActions';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import AppState from '../redux/AppState';
+import UserState from '../models/UserState';
+import { Redirect } from 'react-router';
+import UserInfo from './UserInfo';
+import AuthState from '../models/AuthState';
 
-export class UserPage extends React.Component<any, any> {
+interface IUserPageProps {
+	authState: AuthState;
+	userState: UserState;
+	getUserInfo: Function;
+}
+
+export class UserPage extends React.Component<IUserPageProps, {}> {
 	componentDidMount(): void {
-		this.props.getUserInfo(1);
+		const props: IUserPageProps = this.props as IUserPageProps;
+		if (props.authState.id && props.authState.token) {
+			props.getUserInfo(props.authState.id);
+		}
 	}
 
 	render(): JSX.Element {
+		const props: IUserPageProps = this.props as IUserPageProps;
+
+		if (!props.authState.id || !props.authState.token) {
+			return <Redirect to='/' />;
+		}
+
 		return (
 			<div>
-				<UserInfo userInfo={this.props.userInfo} />
-				<div className='SOMETHING'>Hello</div>
+				<UserInfo userState={props.userState} />
 			</div>
 		);
 	}
@@ -23,11 +41,10 @@ export class UserPage extends React.Component<any, any> {
 	}
 }
 
-const mapStateToProps: any = (state: any) => {
+const mapStateToProps: any = (state: AppState) => {
 	return {
-		userInfo: {
-			...state.userState
-		}
+		authState: state.authState,
+		userState: state.userState
 	};
 };
 
@@ -35,4 +52,5 @@ const mapDispatchToProps: Function = (dispatch: any) => {
 	return bindActionCreators(userActions, dispatch);
 };
 
-export default connect(mapStateToProps, mapDispatchToProps, null, { withRef: true })(UserPage);
+export default connect(mapStateToProps, mapDispatchToProps, null)(UserPage);
+// export default connect(mapStateToProps, mapDispatchToProps, null, { withRef: true })(UserPage);
