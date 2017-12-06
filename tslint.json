@@ -38,23 +38,7 @@
 			true,
 			"check-space"
 		],
-		"member-ordering": [
-			true,
-			{
-				"order": [
-					"public-constructor",
-					"public-instance-method",
-					"public-static-method",
-					"protected-constructor",
-					"protected-instance-method",
-					"protected-static-method",
-					"private-constructor",
-					"private-instance-method",
-					"private-static-method"
-				],
-				"alphabetize": false
-			}
-		],
+		"member-ordering": false,
 		"no-console": [
 			true,
 			"log",

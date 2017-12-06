@@ -8,10 +8,17 @@ import * as Col from 'react-bootstrap/lib/Col';
 import { connect } from 'react-redux';
 import * as mainActions from '../redux/actions/MainActions';
 import { bindActionCreators } from 'redux';
+import InputChecker from '../InputChecker';
 
-interface ISignUpFormProps {
+interface IOwnProps {
+	errorMessage?: string;
+}
+
+interface IDispatchedProps {
 	signUp?: Function;
 }
+
+interface ISignUpFormProps extends IOwnProps, IDispatchedProps {}
 
 interface ISignUpFormState {
 	login: string;
@@ -40,14 +47,18 @@ export class SignUpForm extends React.Component<ISignUpFormProps, ISignUpFormSta
 		this.onSubmit = this.onSubmit.bind(this);
 	}
 
+	static isSubmittable(login: string, password: string, name: string, surname: string): boolean {
+		return InputChecker.checkLogin(login) && InputChecker.checkPassword(password) &&
+				InputChecker.checkName(name) && InputChecker.checkSurname(surname);
+	}
+
 	onLoginChange(e: React.FormEvent<FormControl>): void {
 		const login: string = (e.target as HTMLInputElement).value;
 		this.setState((prevState: ISignUpFormState) => {
 			return {
 				...prevState,
 				login: login,
-				submittable: login.length && prevState.password.length
-				&& prevState.name.length && prevState.surname.length && !prevState.submitted
+				submittable: SignUpForm.isSubmittable(login, prevState.password, prevState.name, prevState.surname)
 			};
 		});
 	}
@@ -58,8 +69,7 @@ export class SignUpForm extends React.Component<ISignUpFormProps, ISignUpFormSta
 			return {
 				...prevState,
 				password: password,
-				submittable: prevState.login.length && password.length
-				&& prevState.name.length && prevState.surname.length && !prevState.submitted
+				submittable: SignUpForm.isSubmittable(prevState.login, password, prevState.name, prevState.surname)
 			};
 		});
 	}
@@ -70,8 +80,7 @@ export class SignUpForm extends React.Component<ISignUpFormProps, ISignUpFormSta
 			return {
 				...prevState,
 				name: name,
-				submittable: prevState.login.length && prevState.password.length
-				&& name.length && prevState.surname.length && !prevState.submitted
+				submittable: SignUpForm.isSubmittable(prevState.login, prevState.password, name, prevState.surname)
 			};
 		});
 	}
@@ -82,8 +91,7 @@ export class SignUpForm extends React.Component<ISignUpFormProps, ISignUpFormSta
 			return {
 				...prevState,
 				surname: surname,
-				submittable: prevState.login.length && prevState.password.length
-				&& prevState.name.length && surname.length && !prevState.submitted
+				submittable: SignUpForm.isSubmittable(prevState.login, prevState.password, prevState.name, surname)
 			};
 		});
 	}
@@ -93,8 +101,7 @@ export class SignUpForm extends React.Component<ISignUpFormProps, ISignUpFormSta
 		this.setState((prevState: ISignUpFormState) => {
 			return {
 				...prevState,
-				submitted: true,
-				submittable: false
+				submitted: true
 			};
 		});
 		const state: ISignUpFormState = this.state as ISignUpFormState;
@@ -139,4 +146,4 @@ const mapDispatchToProps: Function = (dispatch: any) => {
 	return bindActionCreators(mainActions, dispatch);
 };
 
-export default connect(null, mapDispatchToProps, null)(SignUpForm);
+export default connect<{}, {}, IOwnProps>(null, mapDispatchToProps)(SignUpForm);
