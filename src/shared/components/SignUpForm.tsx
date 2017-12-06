@@ -1,8 +1,10 @@
 import * as React from 'react';
-import { FormGroup } from 'react-bootstrap';
-import { FormControl } from 'react-bootstrap';
-import { ControlLabel } from 'react-bootstrap';
-import { Button } from 'react-bootstrap';
+import * as FormGroup from 'react-bootstrap/lib/FormGroup';
+import * as FormControl from 'react-bootstrap/lib/FormControl';
+import * as ControlLabel from 'react-bootstrap/lib/ControlLabel';
+import * as Button from 'react-bootstrap/lib/Button';
+import * as Form from 'react-bootstrap/lib/Form';
+import * as Col from 'react-bootstrap/lib/Col';
 import { connect } from 'react-redux';
 import * as mainActions from '../redux/actions/MainActions';
 import { bindActionCreators } from 'redux';
@@ -104,26 +106,30 @@ export class SignUpForm extends React.Component<ISignUpFormProps, ISignUpFormSta
 		const submittedText: JSX.Element = state.submitted ? <p>Submitted!</p> : <p>Not submitted</p>;
 		return (
 			<div>
-				<form>
+				<Form horizontal>
 					<FormGroup>
-						<ControlLabel>Login</ControlLabel>
-						<FormControl onChange={this.onLoginChange} />
+						<Col sm={2} componentClass={ControlLabel}>Login</Col>
+						<Col sm={10}><FormControl onChange={this.onLoginChange} /></Col>
 					</FormGroup>
 					<FormGroup>
-						<ControlLabel>Password</ControlLabel>
-						<FormControl onChange={this.onPasswordChange} />
+						<Col sm={2} componentClass={ControlLabel}>Password</Col>
+						<Col sm={10}><FormControl onChange={this.onPasswordChange} /></Col>
 					</FormGroup>
 					<FormGroup>
-						<ControlLabel>Name</ControlLabel>
-						<FormControl onChange={this.onNameChange} />
+						<Col sm={2} componentClass={ControlLabel}>Name</Col>
+						<Col sm={10}><FormControl onChange={this.onNameChange} /></Col>
 					</FormGroup>
 					<FormGroup>
-						<ControlLabel>Surname</ControlLabel>
-						<FormControl onChange={this.onSurnameChange} />
+						<Col sm={2} componentClass={ControlLabel}>Surname</Col>
+						<Col sm={10}><FormControl onChange={this.onSurnameChange} /></Col>
 					</FormGroup>
-					<Button type='submit' disabled={!state.submittable} onClick={this.onSubmit}>Send</Button>
-					{submittedText}
-				</form>
+					<Col sm={10} smOffset={2}>
+						<Button type='submit' disabled={!state.submittable} onClick={this.onSubmit}>Send</Button>
+					</Col>
+					<Col sm={10} smOffset={2}>
+						{submittedText}
+					</Col>
+				</Form>
 			</div>
 		);
 	}

@@ -10,9 +10,9 @@ export default {
 			exact: true
 		},
 		{
-			path: '/user',
+			path: '/user/',
 			component: UserPage,
-			exact: true
+			exact: false
 		},
 		{
 			path: '*',

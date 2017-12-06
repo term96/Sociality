@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { AppState } from '../redux/AppState';
+import AppState from '../redux/AppState';
 import { Redirect } from 'react-router';
 import { connect } from 'react-redux';
 import AuthState from '../models/AuthState';
@@ -13,7 +13,8 @@ export class MainPage extends React.Component<IMainPageProps, {}> {
 	render(): JSX.Element {
 		const props: IMainPageProps = this.props as IMainPageProps;
 		if (props.authState.id && props.authState.token) {
-			return <Redirect to='/user' />;
+			const myPageLink: string = `/user/${props.authState.id}`;
+			return <Redirect to={myPageLink} />;
 		}
 		return (
 			<div>
@@ -23,10 +24,10 @@ export class MainPage extends React.Component<IMainPageProps, {}> {
 	}
 }
 
-const mapStatsToProps: any = (state: AppState) => {
+const mapStateToProps: any = (state: AppState) => {
 	return {
 		authState: state.authState
 	};
 };
 
-export default connect(mapStatsToProps, null, null)(MainPage);
+export default connect(mapStateToProps, null, null)(MainPage);

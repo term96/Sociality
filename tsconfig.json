@@ -18,7 +18,7 @@
   },
   "awesomeTypescriptLoaderOptions": {
     "useBabel": true,
-    "useCache": false,
+    "useCache": true,
     "babelOptions": {
       "babelrc": false,
       "presets": ["env"]

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { UserState } from '../redux/AppState';
+import UserState from '../models/UserState';
 
 export interface IUserInfoProps {
 	userState: UserState;
@@ -21,8 +21,7 @@ export default class UserInfo extends React.Component<IUserInfoProps, {}> {
 			<div>
 				<span>Ошибки нет, но и инфы нет :(</span>
 				<span>ID: {props.userState.id}</span>
-				<span>Token: {props.userState.id}</span>
 			</div>
 		);
 	}
-}
+};

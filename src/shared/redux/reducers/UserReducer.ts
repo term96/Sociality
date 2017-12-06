@@ -4,9 +4,8 @@ export default (state: any, action: any) => {
 	if (state === undefined) {
 		return {};
 	}
-	if (action.type === ActionTypes.USER_GET_INFO) {
+	if (action.type === ActionTypes.GET_USER_INFO) {
 		return {
-			...state,
 			...action.payload
 		};
 	}

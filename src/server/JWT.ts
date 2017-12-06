@@ -6,12 +6,12 @@ export default class JWT {
 		return jsonwebtoken.sign({ id: id }, Const.jwtSecret, { expiresIn: '24h' });
 	}
 
-	public static decodeId(token: string): number | null {
+	public static decodeId(token: string): number {
 		try {
 			const payload: JWTPayload = jsonwebtoken.verify(token, Const.jwtSecret);
 			return payload.getId();
 		} catch (err) {
-			return null;
+			return undefined;
 		}
 	}
 }

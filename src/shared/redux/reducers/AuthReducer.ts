@@ -1,11 +1,12 @@
 import { ActionTypes } from '../actions/ActionTypes';
-export default (state: any, action: any) => {
+import AuthState from '../../models/AuthState';
+
+export default (state: AuthState, action: any) => {
 	if (state === undefined) {
 		return {};
 	}
-	if (action.type === ActionTypes.MAIN_SIGN_UP) {
+	if (action.type === ActionTypes.SIGN_UP || action.type === ActionTypes.SIGN_IN) {
 		return {
-			...state,
 			...action.payload
 		};
 	}
