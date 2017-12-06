@@ -24,4 +24,4 @@ export default class UserInfo extends React.Component<IUserInfoProps, {}> {
 			</div>
 		);
 	}
-};
+}

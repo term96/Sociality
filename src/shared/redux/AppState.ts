@@ -5,4 +5,3 @@ export default class AppState {
 	public authState: AuthState;
 	public userState: UserState;
 }
-
