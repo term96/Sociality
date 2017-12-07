@@ -18,7 +18,6 @@ import * as nodePath from 'path';
 import AuthState from '../shared/models/AuthState';
 import UserState from '../shared/models/UserState';
 
-DB.connect();
 const app: express.Express = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
