@@ -4,11 +4,10 @@
   "description": "Project for DB",
   "main": "index.js",
   "scripts": {
-    "validate": "node node_modules/tslint/bin/tslint src/**/*.{ts,tsx}",
-    "build": "webpack && webpack --config webpack.server.config.js",
-    "build-prod": "set NODE_ENV='production' && webpack -p && webpack --config webpack.server.config.js -p",
+    "build": "node node_modules/tslint/bin/tslint src/**/*.{ts,tsx} && webpack && webpack --config webpack.server.config.js",
+    "build-prod": "node node_modules/tslint/bin/tslint src/**/*.{ts,tsx} && set NODE_ENV='production' && webpack -p && webpack --config webpack.server.config.js -p",
     "start": "node build/server/server.js",
-    "build_and_run": "webpack && webpack --config webpack.server.config.js && node build/server/server.js"
+    "build_and_run": "node node_modules/tslint/bin/tslint src/**/*.{ts,tsx} && webpack && webpack --config webpack.server.config.js && node build/server/server.js"
   },
   "author": "Andrey&Maksim",
   "license": "ISC",

@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import { ActionTypes } from './ActionTypes';
-import { Result } from '../../../server/Result';
+import { Result } from '../../Result';
 
 export const signUp: any = (login: string, password: string, name: string, surname: string) => {
 	return (dispatch: Function) => {
