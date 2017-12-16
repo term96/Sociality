@@ -6,19 +6,17 @@ import * as Button from 'react-bootstrap/lib/Button';
 import * as Form from 'react-bootstrap/lib/Form';
 import * as Col from 'react-bootstrap/lib/Col';
 import { connect } from 'react-redux';
-import * as mainActions from '../redux/actions/MainActions';
+import * as MainActions from '../redux/actions/MainActions';
 import { bindActionCreators } from 'redux';
 import InputChecker from '../InputChecker';
+import AuthState from '../models/AuthState';
+import AppState from '../redux/AppState';
+import MessageProvider from '../MessageProvider';
 
-interface IOwnProps {
-	errorMessage?: string;
-}
-
-interface IDispatchedProps {
+interface ISignUpFormProps {
+	authState?: AuthState;
 	signUp?: Function;
 }
-
-interface ISignUpFormProps extends IOwnProps, IDispatchedProps {}
 
 interface ISignUpFormState {
 	login: string;
@@ -26,10 +24,10 @@ interface ISignUpFormState {
 	name: string;
 	surname: string;
 	submittable: boolean;
-	submitted: boolean;
+	showError: boolean;
 }
 
-export class SignUpForm extends React.Component<ISignUpFormProps, ISignUpFormState> {
+class SignUpForm extends React.Component<ISignUpFormProps, ISignUpFormState> {
 	constructor(props: ISignUpFormProps) {
 		super(props);
 		this.state = {
@@ -38,7 +36,7 @@ export class SignUpForm extends React.Component<ISignUpFormProps, ISignUpFormSta
 			name: '',
 			surname: '',
 			submittable: false,
-			submitted: false
+			showError: false
 		};
 		this.onLoginChange = this.onLoginChange.bind(this);
 		this.onPasswordChange = this.onPasswordChange.bind(this);
@@ -101,16 +99,20 @@ export class SignUpForm extends React.Component<ISignUpFormProps, ISignUpFormSta
 		this.setState((prevState: ISignUpFormState) => {
 			return {
 				...prevState,
-				submitted: true
+				showError: true
 			};
 		});
 		const state: ISignUpFormState = this.state as ISignUpFormState;
-		(this.props as ISignUpFormProps).signUp(state.login, state.password, state.name, state.surname);
+		const props: ISignUpFormProps = this.props as ISignUpFormProps;
+		props.signUp(state.login, state.password, state.name, state.surname);
 	}
 
 	render(): JSX.Element {
 		const state: ISignUpFormState = this.state as ISignUpFormState;
-		const submittedText: JSX.Element = state.submitted ? <p>Submitted!</p> : <p>Not submitted</p>;
+		const props: ISignUpFormProps = this.props as ISignUpFormProps;
+		const errorNumber: number = props.authState.errorNumber;
+		const errorText: JSX.Element =
+			errorNumber && state.showError ? <p>{MessageProvider.getMessage(errorNumber)}</p> : null;
 		return (
 			<div>
 				<Form horizontal>
@@ -134,7 +136,7 @@ export class SignUpForm extends React.Component<ISignUpFormProps, ISignUpFormSta
 						<Button type='submit' disabled={!state.submittable} onClick={this.onSubmit}>Send</Button>
 					</Col>
 					<Col sm={10} smOffset={2}>
-						{submittedText}
+						{errorText}
 					</Col>
 				</Form>
 			</div>
@@ -142,8 +144,14 @@ export class SignUpForm extends React.Component<ISignUpFormProps, ISignUpFormSta
 	}
 }
 
-const mapDispatchToProps: Function = (dispatch: any) => {
-	return bindActionCreators(mainActions, dispatch);
+const mapStateToProps: any = (appState: AppState) => {
+	return {
+		authState: appState.authState
+	};
 };
 
-export default connect<{}, {}, IOwnProps>(null, mapDispatchToProps)(SignUpForm);
+const mapDispatchToProps: Function = (dispatch: any) => {
+	return bindActionCreators(MainActions, dispatch);
+};
+
+export default connect<{}, {}, ISignUpFormProps>(mapStateToProps, mapDispatchToProps)(SignUpForm);

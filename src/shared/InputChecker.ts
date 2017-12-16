@@ -14,4 +14,4 @@ export default class InputChecker {
 	static checkSurname(surname: string): boolean {
 		return surname.length > 0;
 	}
-};
+}

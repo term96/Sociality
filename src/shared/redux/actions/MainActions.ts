@@ -4,19 +4,6 @@ import { Result } from '../../Result';
 
 export const signUp: any = (login: string, password: string, name: string, surname: string) => {
 	return (dispatch: Function) => {
-		// const data: object = {
-		// 	login: login,
-		// 	password: password,
-		// 	name: name,
-		// 	surname: surname
-		// };
-		// const response: any = await axios.post('/api/users/sign_up', data);
-		// dispatch({
-		// 	type: ActionTypes.SIGN_UP,
-		// 	payload: {
-		// 		...response.data
-		// 	}
-		// });
 		const data: object = {
 			login: login,
 			password: password,
