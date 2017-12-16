@@ -2,8 +2,8 @@ import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import JWT from './JWT';
 import DB from './DB';
-import { Result } from './Result';
-import UserModel from '../shared/models/UserModel';
+import { Result } from '../shared/Result';
+import UserModel from './models/UserModel';
 import Const from './Const';
 import reducers from '../shared/redux/reducers/AllReducers';
 import { Store, createStore, applyMiddleware } from 'redux';
@@ -18,7 +18,6 @@ import * as nodePath from 'path';
 import AuthState from '../shared/models/AuthState';
 import UserState from '../shared/models/UserState';
 
-DB.connect();
 const app: express.Express = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));

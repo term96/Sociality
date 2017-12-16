@@ -4,5 +4,5 @@ export default class Const {
 	public static readonly dbHost: string = 'localhost';
 	public static readonly dbUser: string = 'root';
 	public static readonly dbPassword: string = 'root';
-	public static readonly dbName: string = 'sociality_new';
+	public static readonly dbName: string = 'sociality';
 }
