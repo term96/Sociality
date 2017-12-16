@@ -136,6 +136,5 @@ const createHtml: Function = (html: string, preloadedState: object) => {
 	`);
 };
 
-const port: string = Const.serverPort;
-
+const port: number = Const.serverPort;
 app.listen(port);

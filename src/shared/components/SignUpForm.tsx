@@ -6,10 +6,15 @@ import * as Button from 'react-bootstrap/lib/Button';
 import * as Form from 'react-bootstrap/lib/Form';
 import * as Col from 'react-bootstrap/lib/Col';
 import { connect } from 'react-redux';
-import * as mainActions from '../redux/actions/MainActions';
+import * as MainActions from '../redux/actions/MainActions';
 import { bindActionCreators } from 'redux';
+import InputChecker from '../InputChecker';
+import AuthState from '../models/AuthState';
+import AppState from '../redux/AppState';
+import MessageProvider from '../MessageProvider';
 
 interface ISignUpFormProps {
+	authState?: AuthState;
 	signUp?: Function;
 }
 
@@ -19,10 +24,10 @@ interface ISignUpFormState {
 	name: string;
 	surname: string;
 	submittable: boolean;
-	submitted: boolean;
+	showError: boolean;
 }
 
-export class SignUpForm extends React.Component<ISignUpFormProps, ISignUpFormState> {
+class SignUpForm extends React.Component<ISignUpFormProps, ISignUpFormState> {
 	constructor(props: ISignUpFormProps) {
 		super(props);
 		this.state = {
@@ -31,7 +36,7 @@ export class SignUpForm extends React.Component<ISignUpFormProps, ISignUpFormSta
 			name: '',
 			surname: '',
 			submittable: false,
-			submitted: false
+			showError: false
 		};
 		this.onLoginChange = this.onLoginChange.bind(this);
 		this.onPasswordChange = this.onPasswordChange.bind(this);
@@ -40,14 +45,18 @@ export class SignUpForm extends React.Component<ISignUpFormProps, ISignUpFormSta
 		this.onSubmit = this.onSubmit.bind(this);
 	}
 
+	static isSubmittable(login: string, password: string, name: string, surname: string): boolean {
+		return InputChecker.checkLogin(login) && InputChecker.checkPassword(password) &&
+				InputChecker.checkName(name) && InputChecker.checkSurname(surname);
+	}
+
 	onLoginChange(e: React.FormEvent<FormControl>): void {
 		const login: string = (e.target as HTMLInputElement).value;
 		this.setState((prevState: ISignUpFormState) => {
 			return {
 				...prevState,
 				login: login,
-				submittable: login.length && prevState.password.length
-				&& prevState.name.length && prevState.surname.length && !prevState.submitted
+				submittable: SignUpForm.isSubmittable(login, prevState.password, prevState.name, prevState.surname)
 			};
 		});
 	}
@@ -58,8 +67,7 @@ export class SignUpForm extends React.Component<ISignUpFormProps, ISignUpFormSta
 			return {
 				...prevState,
 				password: password,
-				submittable: prevState.login.length && password.length
-				&& prevState.name.length && prevState.surname.length && !prevState.submitted
+				submittable: SignUpForm.isSubmittable(prevState.login, password, prevState.name, prevState.surname)
 			};
 		});
 	}
@@ -70,8 +78,7 @@ export class SignUpForm extends React.Component<ISignUpFormProps, ISignUpFormSta
 			return {
 				...prevState,
 				name: name,
-				submittable: prevState.login.length && prevState.password.length
-				&& name.length && prevState.surname.length && !prevState.submitted
+				submittable: SignUpForm.isSubmittable(prevState.login, prevState.password, name, prevState.surname)
 			};
 		});
 	}
@@ -82,8 +89,7 @@ export class SignUpForm extends React.Component<ISignUpFormProps, ISignUpFormSta
 			return {
 				...prevState,
 				surname: surname,
-				submittable: prevState.login.length && prevState.password.length
-				&& prevState.name.length && surname.length && !prevState.submitted
+				submittable: SignUpForm.isSubmittable(prevState.login, prevState.password, prevState.name, surname)
 			};
 		});
 	}
@@ -93,17 +99,20 @@ export class SignUpForm extends React.Component<ISignUpFormProps, ISignUpFormSta
 		this.setState((prevState: ISignUpFormState) => {
 			return {
 				...prevState,
-				submitted: true,
-				submittable: false
+				showError: true
 			};
 		});
 		const state: ISignUpFormState = this.state as ISignUpFormState;
-		(this.props as ISignUpFormProps).signUp(state.login, state.password, state.name, state.surname);
+		const props: ISignUpFormProps = this.props as ISignUpFormProps;
+		props.signUp(state.login, state.password, state.name, state.surname);
 	}
 
 	render(): JSX.Element {
 		const state: ISignUpFormState = this.state as ISignUpFormState;
-		const submittedText: JSX.Element = state.submitted ? <p>Submitted!</p> : <p>Not submitted</p>;
+		const props: ISignUpFormProps = this.props as ISignUpFormProps;
+		const errorNumber: number = props.authState.errorNumber;
+		const errorText: JSX.Element =
+			errorNumber && state.showError ? <p>{MessageProvider.getMessage(errorNumber)}</p> : null;
 		return (
 			<div>
 				<Form horizontal>
@@ -127,7 +136,7 @@ export class SignUpForm extends React.Component<ISignUpFormProps, ISignUpFormSta
 						<Button type='submit' disabled={!state.submittable} onClick={this.onSubmit}>Send</Button>
 					</Col>
 					<Col sm={10} smOffset={2}>
-						{submittedText}
+						{errorText}
 					</Col>
 				</Form>
 			</div>
@@ -135,8 +144,14 @@ export class SignUpForm extends React.Component<ISignUpFormProps, ISignUpFormSta
 	}
 }
 
-const mapDispatchToProps: Function = (dispatch: any) => {
-	return bindActionCreators(mainActions, dispatch);
+const mapStateToProps: any = (appState: AppState) => {
+	return {
+		authState: appState.authState
+	};
 };
 
-export default connect(null, mapDispatchToProps, null)(SignUpForm);
+const mapDispatchToProps: Function = (dispatch: any) => {
+	return bindActionCreators(MainActions, dispatch);
+};
+
+export default connect<{}, {}, ISignUpFormProps>(mapStateToProps, mapDispatchToProps)(SignUpForm);

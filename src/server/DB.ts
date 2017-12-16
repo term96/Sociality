@@ -7,7 +7,7 @@ export default class DB {
 	private static readonly _pool: mysql.Pool = mysql.createPool({
 		connectionLimit: 10,
 		host: Const.dbHost,
-		port: 3306,
+		port: Const.dbPort,
 		user: Const.dbUser,
 		password: Const.dbPassword,
 		database: Const.dbName
@@ -18,18 +18,20 @@ export default class DB {
 			if (err) {
 				callback(Result.INTERNAL_ERROR);
 			}
-			const query: string = 'SELECT * FROM user WHERE login = ? and password = ?';
-			connection.query(query, [login, password], (queryErr: mysql.MysqlError | null, result?: UserModel[]) => {
+
+			const query: string = 'SELECT * FROM user WHERE login = ?';
+			connection.query(query, login, (queryErr: mysql.MysqlError | null, queryResult: UserModel[]) => {
+				connection.release();
 				if (queryErr) {
 					return callback(Result.INTERNAL_ERROR);
 				}
-				if (result.length === 0) {
+				if (queryResult.length === 0) {
 					return callback(Result.USER_NOT_FOUND);
 				}
-				if (result[0].password !== password) {
+				if (queryResult[0].password !== password) {
 					return callback(Result.WRONG_PASSWORD);
 				}
-				callback(Result.OK, result[0]);
+				callback(Result.OK, queryResult[0]);
 			});
 		});
 	}
@@ -44,13 +46,20 @@ export default class DB {
 				if (inUse === Result.LOGIN_IS_IN_USE) {
 					return callback(Result.LOGIN_IS_IN_USE);
 				}
-				const query: string = 'INSERT INTO user (id, login, password, name, surname) VALUES (null, ?, ?, ?, ?)';
-				connection.query(query, [user.login, user.password, user.name, user.surname],
-					(queryErr: mysql.MysqlError | null, result: any) => {
-						if (queryErr) {
-							return callback(Result.INTERNAL_ERROR);
-						}
-						callback(Result.OK, result.insertId);
+				const insertSet: {} = {
+					id: null,
+					login: user.login,
+					password: user.password,
+					name: user.name,
+					surname: user.surname
+				};
+				const query: string = 'INSERT INTO user SET ?';
+				connection.query(query, insertSet, (queryErr: mysql.MysqlError | null, queryResult: any) => {
+					connection.release();
+					if (queryErr) {
+						return callback(Result.INTERNAL_ERROR);
+					}
+					callback(Result.OK, queryResult.insertId);
 				});
 			});
 		});
@@ -61,12 +70,14 @@ export default class DB {
 			if (err) {
 				callback(Result.INTERNAL_ERROR);
 			}
-			const query: string = 'SELECT COUNT(*) FROM user WHERE login = ? AS count';
-			connection.query(query, login, (queryErr: mysql.MysqlError | null, result: any) => {
+
+			const query: string = 'SELECT COUNT(*) AS count FROM user WHERE login = ?';
+			connection.query(query, login, (queryErr: mysql.MysqlError | null, queryResult: any) => {
+				connection.release();
 				if (queryErr) {
 					callback(Result.INTERNAL_ERROR);
 				}
-				callback((result.count) > 0 ? Result.LOGIN_IS_IN_USE : Result.OK);
+				callback((queryResult[0].count) > 0 ? Result.LOGIN_IS_IN_USE : Result.OK);
 			});
 		});
 	}
