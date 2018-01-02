@@ -1,7 +1,7 @@
 import UserModel from './models/UserModel';
 import { Result } from '../shared/Result';
 import * as mysql from 'mysql';
-import Const from './Const';
+import Const from '../shared/Const';
 
 export default class DB {
 	private static readonly _pool: mysql.Pool = mysql.createPool({

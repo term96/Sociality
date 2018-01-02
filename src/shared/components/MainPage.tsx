@@ -2,9 +2,10 @@ import * as React from 'react';
 import AppState from '../redux/AppState';
 import { Redirect } from 'react-router';
 import { connect } from 'react-redux';
-import AuthState from '../models/AuthState';
+import AuthState from '../states/AuthState';
 import { default as SignUpForm } from './SignUpForm';
 import { default as SignInForm } from './SignInForm';
+import PageRoutes from '../routes/PageRoutes';
 
 interface IMainPageProps {
 	authState: AuthState;
@@ -27,7 +28,7 @@ class MainPage extends React.Component<IMainPageProps, IMainPageState> {
 	render(): JSX.Element {
 		const props: IMainPageProps = this.props as IMainPageProps;
 		if (props.authState.id && props.authState.token) {
-			const myPageLink: string = `/user/${props.authState.id}`;
+			const myPageLink: string = PageRoutes.user + `/${props.authState.id}`;
 			return <Redirect to={myPageLink} />;
 		}
 		const state: IMainPageState = this.state as IMainPageState;

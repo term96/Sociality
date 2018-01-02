@@ -1,17 +1,24 @@
 import UserPage from '../components/UserPage';
 import MainPage from '../components/MainPage';
 import NotFoundPage from '../components/NotFoundPage';
+import SignOutPage from '../components/SignOutPage';
+import PageRoutes from '../routes/PageRoutes';
 
 export default {
 	routes: [
 		{
-			path: '/',
+			path: PageRoutes.main,
 			component: MainPage,
 			exact: true
 		},
 		{
-			path: '/user/',
+			path: PageRoutes.user + '/:id',
 			component: UserPage,
+			exact: false
+		},
+		{
+			path: PageRoutes.signOut,
+			component: SignOutPage,
 			exact: false
 		},
 		{

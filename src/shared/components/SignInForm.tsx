@@ -1,12 +1,12 @@
 import * as React from 'react';
-import AuthState from '../models/AuthState';
+import AuthState from '../states/AuthState';
 import InputChecker from '../InputChecker';
 import * as ControlLabel from 'react-bootstrap/lib/ControlLabel';
 import * as Button from 'react-bootstrap/lib/Button';
 import * as FormControl from 'react-bootstrap/lib/FormControl';
 import MessageProvider from '../MessageProvider';
 import AppState from '../redux/AppState';
-import * as MainActions from '../redux/actions/MainActions';
+import * as AuthActions from '../redux/actions/AuthActions';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as Form from 'react-bootstrap/lib/Form';
@@ -114,7 +114,7 @@ const mapStateToProps: any = (appState: AppState) => {
 };
 
 const mapDispatchToProps: Function = (dispatch: any) => {
-	return bindActionCreators(MainActions, dispatch);
+	return bindActionCreators(AuthActions, dispatch);
 };
 
 export default connect<{}, {}, ISignInFormProps>(mapStateToProps, mapDispatchToProps)(SignInForm);

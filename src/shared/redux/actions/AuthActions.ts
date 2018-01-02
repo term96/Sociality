@@ -51,3 +51,11 @@ export const signIn: any = (login: string, password: string) => {
 		});
 	};
 };
+
+export const signOut: any = () => {
+	return (dispatch: Function) => {
+		dispatch({
+			type: ActionTypes.SIGN_OUT
+		});
+	};
+};
