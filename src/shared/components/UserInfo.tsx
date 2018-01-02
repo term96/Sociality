@@ -1,5 +1,5 @@
 import * as React from 'react';
-import UserState from '../models/UserState';
+import UserState from '../states/UserState';
 
 export interface IUserInfoProps {
 	userState: UserState;

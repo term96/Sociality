@@ -1,5 +1,5 @@
 import * as jsonwebtoken from 'jsonwebtoken';
-import Const from './Const';
+import Const from '../shared/Const';
 
 export default class JWT {
 	public static sign(id: number): string {

@@ -6,10 +6,10 @@ import * as Button from 'react-bootstrap/lib/Button';
 import * as Form from 'react-bootstrap/lib/Form';
 import * as Col from 'react-bootstrap/lib/Col';
 import { connect } from 'react-redux';
-import * as MainActions from '../redux/actions/MainActions';
+import * as AuthActions from '../redux/actions/AuthActions';
 import { bindActionCreators } from 'redux';
 import InputChecker from '../InputChecker';
-import AuthState from '../models/AuthState';
+import AuthState from '../states/AuthState';
 import AppState from '../redux/AppState';
 import MessageProvider from '../MessageProvider';
 
@@ -151,7 +151,7 @@ const mapStateToProps: any = (appState: AppState) => {
 };
 
 const mapDispatchToProps: Function = (dispatch: any) => {
-	return bindActionCreators(MainActions, dispatch);
+	return bindActionCreators(AuthActions, dispatch);
 };
 
 export default connect<{}, {}, ISignUpFormProps>(mapStateToProps, mapDispatchToProps)(SignUpForm);

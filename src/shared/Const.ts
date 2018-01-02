@@ -6,4 +6,6 @@ export default class Const {
 	public static readonly dbUser: string = 'root';
 	public static readonly dbPassword: string = 'root';
 	public static readonly dbName: string = 'sociality';
+	public static readonly storageToken: string = 'SOCIALITY_TOKEN';
+	public static readonly storageId: string = 'SOCIALITY_ID';
 }
