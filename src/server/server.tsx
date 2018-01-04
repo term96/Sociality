@@ -3,7 +3,7 @@ import * as bodyParser from 'body-parser';
 import JWT from './JWT';
 import DB from './DB';
 import { Result } from '../shared/Result';
-import UserModel from './models/UserModel';
+import User from './models/User';
 import Const from '../shared/Const';
 import reducers from '../shared/redux/reducers/AllReducers';
 import { Store, createStore, applyMiddleware } from 'redux';
@@ -16,7 +16,7 @@ import * as ReactDOMServer from 'react-dom/server';
 import App from '../shared/components/App';
 import * as nodePath from 'path';
 import AuthInfo from '../shared/models/AuthInfo';
-import UserState from '../shared/states/UserState';
+import UserInfo from '../shared/models/UserInfo';
 
 const app: express.Express = express();
 
@@ -31,7 +31,7 @@ app.post('/api/users/sign_up', (req: express.Request, res: express.Response) => 
 		return res.json(response);
 	}
 
-	const user: UserModel = new UserModel(undefined, req.body.login, req.body.password, req.body.name, req.body.surname);
+	const user: User = new User(undefined, req.body.login, req.body.password, req.body.name, req.body.surname);
 
 	DB.insertUser(user, (result: Result, id?: number) => {
 		const response: AuthInfo = (result === Result.OK)
@@ -47,20 +47,24 @@ app.post('/api/users/sign_in', (req: express.Request, res: express.Response) => 
 		return res.json(response);
 	}
 
-	DB.getUser(req.body.login, req.body.password, (result: Result, user?: UserModel) => {
+	DB.getUserId(req.body.login, req.body.password, (result: Result, id?: number) => {
 		const response: AuthInfo = (result === Result.OK)
-			? new AuthInfo(undefined, user.id, JWT.sign(user.id))
+			? new AuthInfo(undefined, id, JWT.sign(id))
 			: new AuthInfo(result);
 		res.json(response);
 	});
 });
 
 app.get('/api/users/:id', (req: express.Request, res: express.Response) => {
-	const response: UserState = new UserState(undefined, req.params.id);
-	res.json(response);
+	DB.getUserById(req.params.id, (result: Result, user?: User) => {
+		const response: UserInfo = (result === Result.OK)
+			? new UserInfo(undefined, user.id, user.name, user.surname, user.city, user.birthday, user.about, user.avatarPath)
+			: new UserInfo(result);
+		res.json(response);
+	});
 });
 
-app.get('*', async (req: express.Request, res: express.Response) => {
+app.get('*', (req: express.Request, res: express.Response) => {
 	try {
 		const store: Store<any> = createStore(reducers, {}, applyMiddleware(thunk));
 		let foundPath: match<any> = null;

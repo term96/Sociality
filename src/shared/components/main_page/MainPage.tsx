@@ -1,11 +1,11 @@
 import * as React from 'react';
-import AppState from '../redux/AppState';
+import AppState from '../../redux/AppState';
 import { Redirect } from 'react-router';
 import { connect } from 'react-redux';
-import AuthState from '../states/AuthState';
+import AuthState from '../../states/AuthState';
 import { default as SignUpForm } from './SignUpForm';
 import { default as SignInForm } from './SignInForm';
-import PageRoutes from '../routes/PageRoutes';
+import PageRoutes from '../../routes/PageRoutes';
 
 interface IMainPageProps {
 	authState: AuthState;

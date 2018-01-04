@@ -59,7 +59,6 @@
     "axios": "^0.17.0",
     "bluebird": "^3.5.1",
     "body-parser": "^1.18.2",
-    "dotenv": "^4.0.0",
     "express": "^4.16.2",
     "jsonwebtoken": "^8.1.0",
     "mysql": "^2.15.0",
