@@ -1,4 +1,4 @@
-import UserModel from './models/UserModel';
+import User from './models/User';
 import { Result } from '../shared/Result';
 import * as mysql from 'mysql';
 import Const from '../shared/Const';
@@ -13,14 +13,35 @@ export default class DB {
 		database: Const.dbName
 	});
 
-	public static getUser(login: string, password: string, callback: (result: Result, user?: UserModel) => void): void {
+	public static getUserById(id: number, callback: (result: Result, user?: User) => void): void {
 		DB._pool.getConnection((err: Error, connection: mysql.PoolConnection) => {
 			if (err) {
 				callback(Result.INTERNAL_ERROR);
 			}
 
-			const query: string = 'SELECT * FROM user WHERE login = ?';
-			connection.query(query, login, (queryErr: mysql.MysqlError | null, queryResult: UserModel[]) => {
+			const query: string = 'SELECT user.id, user.name, user.surname, user.city, user.birthday, user.about, ' +
+				'file.name AS avatarPath FROM user LEFT JOIN file ON user.id_file_avatar = file.id WHERE user.id = ?';
+			connection.query(query, id, (queryErr: mysql.MysqlError | null, queryResult: any) => {
+				connection.release();
+				if (queryErr) {
+					return callback(Result.INTERNAL_ERROR);
+				}
+				if (queryResult.length === 0) {
+					return callback(Result.USER_NOT_FOUND);
+				}
+				callback(Result.OK, queryResult[0]);
+			});
+		});
+	}
+
+	public static getUserId(login: string, password: string, callback: (result: Result, id?: number) => void): void {
+		DB._pool.getConnection((err: Error, connection: mysql.PoolConnection) => {
+			if (err) {
+				callback(Result.INTERNAL_ERROR);
+			}
+
+			const query: string = 'SELECT id, password FROM user WHERE login = ?';
+			connection.query(query, login, (queryErr: mysql.MysqlError | null, queryResult: any) => {
 				connection.release();
 				if (queryErr) {
 					return callback(Result.INTERNAL_ERROR);
@@ -31,12 +52,12 @@ export default class DB {
 				if (queryResult[0].password !== password) {
 					return callback(Result.WRONG_PASSWORD);
 				}
-				callback(Result.OK, queryResult[0]);
+				callback(Result.OK, queryResult[0].id);
 			});
 		});
 	}
 
-	public static insertUser(user: UserModel, callback: (result: Result, id?: number) => void): void {
+	public static insertUser(user: User, callback: (result: Result, id?: number) => void): void {
 		DB._pool.getConnection((err: Error, connection: mysql.PoolConnection) => {
 			if (err) {
 				callback(Result.INTERNAL_ERROR);

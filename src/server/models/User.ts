@@ -1,16 +1,16 @@
-export default class UserModel {
+export default class User {
 	public id?: number;
 	public login?: string;
 	public password?: string;
 	public name?: string;
 	public surname?: string;
 	public city?: string;
-	public birthday?: Date;
+	public birthday?: number;
 	public about?: string;
-	public avatar?: any;
+	public avatarPath?: string;
 
 	public constructor(id?: number, login?: string, password?: string, name?: string, surname?: string, city?: string,
-			birthday?: Date, about?: string, avatar?: any) {
+			birthday?: number, about?: string, avatarPath?: string) {
 		this.id = id;
 		this.login = login;
 		this.password = password;
@@ -19,6 +19,6 @@ export default class UserModel {
 		this.city = city;
 		this.birthday = birthday;
 		this.about = about;
-		this.avatar = avatar;
+		this.avatarPath = avatarPath;
 	}
 }

@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import App from '../shared/components/App';
 import store from '../shared/redux/Store';
 import '../shared/css/bootstrap.css';
+import '../shared/css/my_styles.css';
 
 ReactDOM.hydrate((
 	<Provider store={store}>

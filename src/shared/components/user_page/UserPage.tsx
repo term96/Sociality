@@ -1,13 +1,13 @@
 import * as React from 'react';
-import * as userActions from '../redux/actions/UserActions';
+import * as userActions from '../../redux/actions/UserActions';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import AppState from '../redux/AppState';
-import UserState from '../states/UserState';
+import AppState from '../../redux/AppState';
+import UserState from '../../states/UserState';
 import { Redirect } from 'react-router';
-import UserInfo from './UserInfo';
-import AuthState from '../states/AuthState';
-import PageRoutes from '../routes/PageRoutes';
+import UserInfoPanel from './UserInfoPanel';
+import AuthState from '../../states/AuthState';
+import PageRoutes from '../../routes/PageRoutes';
 
 interface IUserPageProps {
 	authState: AuthState;
@@ -32,13 +32,9 @@ class UserPage extends React.Component<IUserPageProps, {}> {
 
 		return (
 			<div>
-				<UserInfo userState={props.userState} />
+				<UserInfoPanel userState={props.userState} />
 			</div>
 		);
-	}
-
-	static fetchData({ store }: any): any {
-		return store.dispatch(userActions.getUserInfo(1));
 	}
 }
 

@@ -1,12 +1,12 @@
 import * as React from 'react';
-import AuthState from '../states/AuthState';
-import InputChecker from '../InputChecker';
+import AuthState from '../../states/AuthState';
+import InputChecker from '../../InputChecker';
 import * as ControlLabel from 'react-bootstrap/lib/ControlLabel';
 import * as Button from 'react-bootstrap/lib/Button';
 import * as FormControl from 'react-bootstrap/lib/FormControl';
-import MessageProvider from '../MessageProvider';
-import AppState from '../redux/AppState';
-import * as AuthActions from '../redux/actions/AuthActions';
+import MessageProvider from '../../MessageProvider';
+import AppState from '../../redux/AppState';
+import * as AuthActions from '../../redux/actions/AuthActions';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as Form from 'react-bootstrap/lib/Form';

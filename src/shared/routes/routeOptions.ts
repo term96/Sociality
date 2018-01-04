@@ -1,5 +1,5 @@
-import UserPage from '../components/UserPage';
-import MainPage from '../components/MainPage';
+import UserPage from '../components/user_page/UserPage';
+import MainPage from '../components/main_page/MainPage';
 import NotFoundPage from '../components/NotFoundPage';
 import SignOutPage from '../components/SignOutPage';
 import PageRoutes from '../routes/PageRoutes';

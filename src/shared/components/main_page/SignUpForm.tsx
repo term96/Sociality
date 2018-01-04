@@ -6,12 +6,12 @@ import * as Button from 'react-bootstrap/lib/Button';
 import * as Form from 'react-bootstrap/lib/Form';
 import * as Col from 'react-bootstrap/lib/Col';
 import { connect } from 'react-redux';
-import * as AuthActions from '../redux/actions/AuthActions';
+import * as AuthActions from '../../redux/actions/AuthActions';
 import { bindActionCreators } from 'redux';
-import InputChecker from '../InputChecker';
-import AuthState from '../states/AuthState';
-import AppState from '../redux/AppState';
-import MessageProvider from '../MessageProvider';
+import InputChecker from '../../InputChecker';
+import AuthState from '../../states/AuthState';
+import AppState from '../../redux/AppState';
+import MessageProvider from '../../MessageProvider';
 
 interface ISignUpFormProps {
 	authState?: AuthState;
