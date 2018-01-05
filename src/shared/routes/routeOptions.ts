@@ -1,5 +1,6 @@
 import UserPage from '../components/user_page/UserPage';
 import MainPage from '../components/main_page/MainPage';
+import EditPage from '../components/edit_page/EditPage';
 import NotFoundPage from '../components/NotFoundPage';
 import SignOutPage from '../components/SignOutPage';
 import PageRoutes from '../routes/PageRoutes';
@@ -19,7 +20,12 @@ export default {
 		{
 			path: PageRoutes.signOut,
 			component: SignOutPage,
-			exact: false
+			exact: true
+		},
+		{
+			path: PageRoutes.edit,
+			component: EditPage,
+			exact: true
 		},
 		{
 			path: '*',

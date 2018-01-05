@@ -13,9 +13,9 @@ import AuthState from '../../states/AuthState';
 import AppState from '../../redux/AppState';
 import MessageProvider from '../../MessageProvider';
 
-interface ISignUpFormProps {
+interface ISignUpFormProps extends React.ClassAttributes<SignUpForm> {
 	authState?: AuthState;
-	signUp?: Function;
+	signUp?: (login: string, password: string, name: string, surname: string) => void;
 }
 
 interface ISignUpFormState {
@@ -46,8 +46,8 @@ class SignUpForm extends React.Component<ISignUpFormProps, ISignUpFormState> {
 	}
 
 	static isSubmittable(login: string, password: string, name: string, surname: string): boolean {
-		return InputChecker.checkLogin(login) && InputChecker.checkPassword(password) &&
-				InputChecker.checkName(name) && InputChecker.checkSurname(surname);
+		return InputChecker.checkLogin(login) && InputChecker.checkPassword(password)
+				&& InputChecker.checkName(name) && InputChecker.checkSurname(surname);
 	}
 
 	onLoginChange(e: React.FormEvent<FormControl>): void {
@@ -103,37 +103,37 @@ class SignUpForm extends React.Component<ISignUpFormProps, ISignUpFormState> {
 			};
 		});
 		const state: ISignUpFormState = this.state as ISignUpFormState;
-		const props: ISignUpFormProps = this.props as ISignUpFormProps;
+		const props: ISignUpFormProps = this.props;
 		props.signUp(state.login, state.password, state.name, state.surname);
 	}
 
 	render(): JSX.Element {
 		const state: ISignUpFormState = this.state as ISignUpFormState;
-		const props: ISignUpFormProps = this.props as ISignUpFormProps;
-		const errorNumber: number = props.authState.errorNumber;
+		const props: ISignUpFormProps = this.props;
+		const errorNumber: number = props.authState.resultCode;
 		const errorText: JSX.Element =
 			errorNumber && state.showError ? <p>{MessageProvider.getMessage(errorNumber)}</p> : null;
 		return (
 			<div>
 				<Form horizontal>
 					<FormGroup>
-						<Col sm={2} componentClass={ControlLabel}>Login</Col>
+						<Col sm={2} componentClass={ControlLabel}>Логин:</Col>
 						<Col sm={10}><FormControl onChange={this.onLoginChange} /></Col>
 					</FormGroup>
 					<FormGroup>
-						<Col sm={2} componentClass={ControlLabel}>Password</Col>
+						<Col sm={2} componentClass={ControlLabel}>Пароль:</Col>
 						<Col sm={10}><FormControl onChange={this.onPasswordChange} /></Col>
 					</FormGroup>
 					<FormGroup>
-						<Col sm={2} componentClass={ControlLabel}>Name</Col>
+						<Col sm={2} componentClass={ControlLabel}>Имя:</Col>
 						<Col sm={10}><FormControl onChange={this.onNameChange} /></Col>
 					</FormGroup>
 					<FormGroup>
-						<Col sm={2} componentClass={ControlLabel}>Surname</Col>
+						<Col sm={2} componentClass={ControlLabel}>Фамилия:</Col>
 						<Col sm={10}><FormControl onChange={this.onSurnameChange} /></Col>
 					</FormGroup>
 					<Col sm={10} smOffset={2}>
-						<Button type='submit' disabled={!state.submittable} onClick={this.onSubmit}>Send</Button>
+						<Button type='submit' disabled={!state.submittable} onClick={this.onSubmit}>Зарегистрироваться</Button>
 					</Col>
 					<Col sm={10} smOffset={2}>
 						{errorText}

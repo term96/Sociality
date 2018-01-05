@@ -1,25 +1,15 @@
 import * as React from 'react';
 import UserState from '../../states/UserState';
-import MessageProvider from '../../MessageProvider';
 import * as Col from 'react-bootstrap/lib/Col';
 import * as Image from 'react-bootstrap/lib/Image';
 
-export interface IUserInfoPanelProps {
+interface IUserInfoPanelProps extends React.ClassAttributes<UserInfoPanel> {
 	userState: UserState;
 }
 
 export default class UserInfoPanel extends React.Component<IUserInfoPanelProps, {}> {
 	render(): JSX.Element {
 		const props: IUserInfoPanelProps = this.props;
-
-		if (props.userState.errorNumber) {
-			return (
-				<div>
-					<span>{MessageProvider.getMessage(props.userState.errorNumber)}</span>
-				</div>
-			);
-		}
-
 		const avatarPath: string = `/${props.userState.avatarPath}`;
 		const name: JSX.Element = <h3 className='no-top-margin'>{props.userState.name} {props.userState.surname}</h3>;
 		const city: JSX.Element = (props.userState.city) ? <p>Город: {props.userState.city}</p> : null;

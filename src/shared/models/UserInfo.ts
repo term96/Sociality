@@ -1,5 +1,4 @@
 export default class UserInfo {
-	public errorNumber?: number;
 	public id?: number;
 	public name?: string;
 	public surname?: string;
@@ -8,9 +7,8 @@ export default class UserInfo {
 	public about?: string;
 	public avatarPath?: string;
 
-	public constructor(errorNumber?: number, id?: number, name?: string, surname?: string, city?: string,
+	public constructor(id?: number, name?: string, surname?: string, city?: string,
 			birthday?: number, about?: string, avatarPath?: string) {
-		this.errorNumber = errorNumber;
 		this.id = id;
 		this.name = name;
 		this.surname = surname;

@@ -1,10 +1,12 @@
+import { ResultCode } from '../ResultCode';
+
 export default class AuthState {
-	public errorNumber?: number;
+	public resultCode?: ResultCode;
 	public id?: number;
 	public token?: string;
 
-	public constructor(errorNumber?: number, id?: number, token?: string) {
-		this.errorNumber = errorNumber;
+	public constructor(resultCode?: ResultCode, id?: number, token?: string) {
+		this.resultCode = resultCode;
 		this.id = id;
 		this.token = token;
 	}

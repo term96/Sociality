@@ -9,7 +9,7 @@ export default class JWT {
 	public static decodeId(token: string): number {
 		try {
 			const payload: JWTPayload = jsonwebtoken.verify(token, Const.jwtSecret);
-			return payload.getId();
+			return payload.id;
 		} catch (err) {
 			return undefined;
 		}
@@ -17,11 +17,8 @@ export default class JWT {
 }
 
 class JWTPayload {
-	private _id: number;
+	public id: number;
 	public constructor(id: number) {
-		this._id = id;
-	}
-	public getId(): number {
-		return this._id;
+		this.id = id;
 	}
 }

@@ -2,8 +2,8 @@ import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import JWT from './JWT';
 import DB from './DB';
-import { Result } from '../shared/Result';
-import User from './models/User';
+import { ResultCode } from '../shared/ResultCode';
+import User from '../shared/models/User';
 import Const from '../shared/Const';
 import reducers from '../shared/redux/reducers/AllReducers';
 import { Store, createStore, applyMiddleware } from 'redux';
@@ -15,8 +15,9 @@ import * as React from 'react';
 import * as ReactDOMServer from 'react-dom/server';
 import App from '../shared/components/App';
 import * as nodePath from 'path';
-import AuthInfo from '../shared/models/AuthInfo';
-import UserInfo from '../shared/models/UserInfo';
+import AuthState from '../shared/states/AuthState';
+import UserState from '../shared/states/UserState';
+import EditState from '../shared/states/EditState';
 
 const app: express.Express = express();
 
@@ -27,40 +28,80 @@ app.use('/assets', express.static(nodePath.resolve(__dirname, '../../public/asse
 
 app.post('/api/users/sign_up', (req: express.Request, res: express.Response) => {
 	if (!req.body || !req.body.login || !req.body.password || !req.body.name || !req.body.surname) {
-		const response: AuthInfo = new AuthInfo(Result.INVALID_BODY);
+		const response: AuthState = new AuthState(ResultCode.INVALID_BODY);
 		return res.json(response);
 	}
 
 	const user: User = new User(undefined, req.body.login, req.body.password, req.body.name, req.body.surname);
 
-	DB.insertUser(user, (result: Result, id?: number) => {
-		const response: AuthInfo = (result === Result.OK)
-			? new AuthInfo(undefined, id, JWT.sign(id))
-			: new AuthInfo(result);
+	DB.insertUser(user, (result: ResultCode, id?: number) => {
+		const response: AuthState = (result === ResultCode.OK)
+			? new AuthState(result, id, JWT.sign(id))
+			: new AuthState(result);
 		res.json(response);
 	});
 });
 
 app.post('/api/users/sign_in', (req: express.Request, res: express.Response) => {
 	if (!req.body || !req.body.login || !req.body.password) {
-		const response: AuthInfo = new AuthInfo(Result.INVALID_BODY);
+		const response: AuthState = new AuthState(ResultCode.INVALID_BODY);
 		return res.json(response);
 	}
 
-	DB.getUserId(req.body.login, req.body.password, (result: Result, id?: number) => {
-		const response: AuthInfo = (result === Result.OK)
-			? new AuthInfo(undefined, id, JWT.sign(id))
-			: new AuthInfo(result);
+	DB.getUserId(req.body.login, req.body.password, (result: ResultCode, id?: number) => {
+		const response: AuthState = (result === ResultCode.OK)
+			? new AuthState(result, id, JWT.sign(id))
+			: new AuthState(result);
 		res.json(response);
 	});
 });
 
-app.get('/api/users/:id', (req: express.Request, res: express.Response) => {
-	DB.getUserById(req.params.id, (result: Result, user?: User) => {
-		const response: UserInfo = (result === Result.OK)
-			? new UserInfo(undefined, user.id, user.name, user.surname, user.city, user.birthday, user.about, user.avatarPath)
-			: new UserInfo(result);
+app.get('/api/users/:id/:token', (req: express.Request, res: express.Response) => {
+	const userId: number = JWT.decodeId(req.params.token);
+	if (userId === undefined) {
+		res.json(new UserState(ResultCode.TOKEN_REQUIRED));
+		return;
+	}
+
+	DB.getUserById(req.params.id, (result: ResultCode, user?: User) => {
+		const response: UserState = (result === ResultCode.OK)
+			? new UserState(result, user.id, user.name, user.surname, user.city, user.birthday, user.about, user.avatarPath)
+			: new UserState(result);
 		res.json(response);
+	});
+});
+
+app.get('/api/edit/:token', (req: express.Request, res: express.Response) => {
+	const userId: number = JWT.decodeId(req.params.token);
+	if (userId === undefined) {
+		res.json(new EditState(ResultCode.TOKEN_REQUIRED));
+		return;
+	}
+
+	DB.getUserById(userId, (result: ResultCode, user?: User) => {
+		const response: EditState = (result === ResultCode.OK)
+			? new EditState(result, user.login, user.name, user.surname, user.city, user.birthday, user.about, user.avatarPath)
+			: new EditState(result);
+		res.json(response);
+	});
+});
+
+app.put('/api/edit/info/:token', (req: express.Request, res: express.Response) => {
+	const userId: number = JWT.decodeId(req.params.token);
+	if (userId === undefined) {
+		return res.json(new EditState(ResultCode.TOKEN_REQUIRED));
+	}
+
+	if (!req.body || !req.body.name || !req.body.surname) {
+		return res.json(new EditState(ResultCode.INVALID_BODY));
+	}
+
+	const newData: User = new User(
+		userId, undefined, undefined, req.body.name, req.body.surname, req.body.city, req.body.birthday, req.body.about
+	);
+
+	DB.editUserInfo(newData, (result: ResultCode) => {
+		res.json(new EditState(result));
 	});
 });
 

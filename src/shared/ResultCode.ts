@@ -1,4 +1,4 @@
-export enum Result {
+export enum ResultCode {
 	OK,
 	INTERNAL_ERROR,
 	USER_NOT_FOUND,

@@ -1,5 +1,5 @@
-import User from './models/User';
-import { Result } from '../shared/Result';
+import User from '../shared/models/User';
+import { ResultCode } from '../shared/ResultCode';
 import * as mysql from 'mysql';
 import Const from '../shared/Const';
 
@@ -13,59 +13,88 @@ export default class DB {
 		database: Const.dbName
 	});
 
-	public static getUserById(id: number, callback: (result: Result, user?: User) => void): void {
+	public static editUserInfo(user: User, callback: (result: ResultCode) => void): void {
+		const newData: object = {
+			name: user.name,
+			surname: user.surname,
+			city: user.city,
+			birthday: user.birthday,
+			about: user.about
+		};
+
+		DB.updateUser(user.id, newData, callback);
+	}
+
+	public static updateUser(id: number, dataMap: object, callback: (result: ResultCode) => void): void {
 		DB._pool.getConnection((err: Error, connection: mysql.PoolConnection) => {
 			if (err) {
-				callback(Result.INTERNAL_ERROR);
+				callback(ResultCode.INTERNAL_ERROR);
 			}
 
-			const query: string = 'SELECT user.id, user.name, user.surname, user.city, user.birthday, user.about, ' +
-				'file.name AS avatarPath FROM user LEFT JOIN file ON user.id_file_avatar = file.id WHERE user.id = ?';
-			connection.query(query, id, (queryErr: mysql.MysqlError | null, queryResult: any) => {
+			const query: string = 'UPDATE user SET ? WHERE id = ?';
+			connection.query(query, [dataMap, id], (queryErr: mysql.MysqlError | null) => {
 				connection.release();
 				if (queryErr) {
-					return callback(Result.INTERNAL_ERROR);
+					return callback(ResultCode.INTERNAL_ERROR);
 				}
-				if (queryResult.length === 0) {
-					return callback(Result.USER_NOT_FOUND);
-				}
-				callback(Result.OK, queryResult[0]);
+				callback(ResultCode.OK);
 			});
 		});
 	}
 
-	public static getUserId(login: string, password: string, callback: (result: Result, id?: number) => void): void {
+	public static getUserById(id: number, callback: (result: ResultCode, user?: User) => void): void {
 		DB._pool.getConnection((err: Error, connection: mysql.PoolConnection) => {
 			if (err) {
-				callback(Result.INTERNAL_ERROR);
+				callback(ResultCode.INTERNAL_ERROR);
+			}
+
+			const query: string = 'SELECT user.id, user.login, user.name, user.surname, user.city, user.birthday, user.about, ' +
+				'file.name AS avatarPath FROM user LEFT JOIN file ON user.id_file_avatar = file.id WHERE user.id = ?';
+			connection.query(query, id, (queryErr: mysql.MysqlError | null, queryResult: any) => {
+				connection.release();
+				if (queryErr) {
+					return callback(ResultCode.INTERNAL_ERROR);
+				}
+				if (queryResult.length === 0) {
+					return callback(ResultCode.USER_NOT_FOUND);
+				}
+				callback(ResultCode.OK, queryResult[0]);
+			});
+		});
+	}
+
+	public static getUserId(login: string, password: string, callback: (result: ResultCode, id?: number) => void): void {
+		DB._pool.getConnection((err: Error, connection: mysql.PoolConnection) => {
+			if (err) {
+				callback(ResultCode.INTERNAL_ERROR);
 			}
 
 			const query: string = 'SELECT id, password FROM user WHERE login = ?';
 			connection.query(query, login, (queryErr: mysql.MysqlError | null, queryResult: any) => {
 				connection.release();
 				if (queryErr) {
-					return callback(Result.INTERNAL_ERROR);
+					return callback(ResultCode.INTERNAL_ERROR);
 				}
 				if (queryResult.length === 0) {
-					return callback(Result.USER_NOT_FOUND);
+					return callback(ResultCode.USER_NOT_FOUND);
 				}
 				if (queryResult[0].password !== password) {
-					return callback(Result.WRONG_PASSWORD);
+					return callback(ResultCode.WRONG_PASSWORD);
 				}
-				callback(Result.OK, queryResult[0].id);
+				callback(ResultCode.OK, queryResult[0].id);
 			});
 		});
 	}
 
-	public static insertUser(user: User, callback: (result: Result, id?: number) => void): void {
+	public static insertUser(user: User, callback: (result: ResultCode, id?: number) => void): void {
 		DB._pool.getConnection((err: Error, connection: mysql.PoolConnection) => {
 			if (err) {
-				callback(Result.INTERNAL_ERROR);
+				callback(ResultCode.INTERNAL_ERROR);
 			}
 
-			DB.isLoginInUse(user.login, (inUse: Result) => {
-				if (inUse === Result.LOGIN_IS_IN_USE) {
-					return callback(Result.LOGIN_IS_IN_USE);
+			DB.isLoginInUse(user.login, (inUse: ResultCode) => {
+				if (inUse === ResultCode.LOGIN_IS_IN_USE) {
+					return callback(ResultCode.LOGIN_IS_IN_USE);
 				}
 				const insertSet: {} = {
 					id: null,
@@ -78,27 +107,27 @@ export default class DB {
 				connection.query(query, insertSet, (queryErr: mysql.MysqlError | null, queryResult: any) => {
 					connection.release();
 					if (queryErr) {
-						return callback(Result.INTERNAL_ERROR);
+						return callback(ResultCode.INTERNAL_ERROR);
 					}
-					callback(Result.OK, queryResult.insertId);
+					callback(ResultCode.OK, queryResult.insertId);
 				});
 			});
 		});
 	}
 
-	private static isLoginInUse(login: string, callback: (result: Result) => void): void {
+	private static isLoginInUse(login: string, callback: (result: ResultCode) => void): void {
 		DB._pool.getConnection((err: Error, connection: mysql.PoolConnection) => {
 			if (err) {
-				callback(Result.INTERNAL_ERROR);
+				callback(ResultCode.INTERNAL_ERROR);
 			}
 
 			const query: string = 'SELECT COUNT(*) AS count FROM user WHERE login = ?';
 			connection.query(query, login, (queryErr: mysql.MysqlError | null, queryResult: any) => {
 				connection.release();
 				if (queryErr) {
-					callback(Result.INTERNAL_ERROR);
+					callback(ResultCode.INTERNAL_ERROR);
 				}
-				callback((queryResult[0].count) > 0 ? Result.LOGIN_IS_IN_USE : Result.OK);
+				callback((queryResult[0].count) > 0 ? ResultCode.LOGIN_IS_IN_USE : ResultCode.OK);
 			});
 		});
 	}
