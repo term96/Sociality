@@ -12,6 +12,7 @@ import { connect } from 'react-redux';
 import * as Form from 'react-bootstrap/lib/Form';
 import * as FormGroup from 'react-bootstrap/lib/FormGroup';
 import * as Col from 'react-bootstrap/lib/Col';
+import * as Row from 'react-bootstrap/lib/Row';
 
 interface ISignInFormProps extends React.ClassAttributes<SignInForm> {
 	authState?: AuthState;
@@ -89,18 +90,22 @@ class SignInForm extends React.Component<ISignInFormProps, ISignInFormState> {
 				<Form horizontal>
 					<FormGroup>
 						<Col sm={2} componentClass={ControlLabel}>Логин:</Col>
-						<Col sm={10}><FormControl onChange={this.onLoginChange} /></Col>
+						<Col sm={10}><FormControl onChange={this.onLoginChange}/></Col>
 					</FormGroup>
 					<FormGroup>
 						<Col sm={2} componentClass={ControlLabel}>Пароль:</Col>
-						<Col sm={10}><FormControl onChange={this.onPasswordChange} /></Col>
+						<Col sm={10}><FormControl onChange={this.onPasswordChange}/></Col>
 					</FormGroup>
-					<Col sm={10} smOffset={2}>
-						<Button type='submit' disabled={!state.submittable} onClick={this.onSubmit}>Войти</Button>
-					</Col>
-					<Col sm={10} smOffset={2}>
-						{errorText}
-					</Col>
+					<Row>
+						<Col sm={10} smOffset={2}>
+							<Button type='submit' disabled={!state.submittable} onClick={this.onSubmit}>Войти</Button>
+						</Col>
+					</Row>
+					<Row>
+						<Col sm={10} smOffset={2}>
+							{errorText}
+						</Col>
+					</Row>
 				</Form>
 			</div>
 		);

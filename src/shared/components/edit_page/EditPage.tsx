@@ -8,7 +8,8 @@ import { bindActionCreators } from 'redux';
 import * as EditActions from '../../redux/actions/EditActions';
 import LoadingAlert from '../alerts/LoadingAlert';
 import { ResultCode } from '../../ResultCode';
-import ErrorAlert from '../alerts/ResultAlert';
+import InfoAlert from '../alerts/InfoAlert';
+import { default as AvatarUploader } from './AvatarUploader';
 
 interface IEditPageProps extends React.ClassAttributes<EditPage> {
 	authState?: AuthState;
@@ -57,11 +58,14 @@ class EditPage extends React.Component<IEditPageProps> {
 		}
 
 		if (!state.showForm) {
-			return <ErrorAlert resultCode={props.editState.resultCode} />;
+			return <InfoAlert resultCode={props.editState.resultCode} />;
 		}
 
 		return (
-			<InfoEditForm editState={props.editState} token={props.authState.token}/>
+			<div>
+				<AvatarUploader token={props.authState.token} />
+				<InfoEditForm editState={props.editState} token={props.authState.token} />
+			</div>
 		);
 	}
 }

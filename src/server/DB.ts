@@ -2,6 +2,7 @@ import User from '../shared/models/User';
 import { ResultCode } from '../shared/ResultCode';
 import * as mysql from 'mysql';
 import Const from '../shared/Const';
+import SearchData from '../shared/models/SearchData';
 
 export default class DB {
 	private static readonly _pool: mysql.Pool = mysql.createPool({
@@ -12,6 +13,79 @@ export default class DB {
 		password: Const.dbPassword,
 		database: Const.dbName
 	});
+
+	public static searchUsers(data: SearchData, limit: number, offset: number,
+			callback: (result: ResultCode, users?: User[]) => void): void {
+		DB._pool.getConnection((err: Error, connection: mysql.PoolConnection) => {
+			if (err) {
+				callback(ResultCode.INTERNAL_ERROR);
+			}
+
+			const values: any[] = [];
+			let condition: string = '';
+
+			if (data.name !== undefined) {
+				condition = ' WHERE user.name = ?';
+				values.push(data.name);
+			}
+			if (data.surname !== undefined) {
+				condition = (condition) ? condition + ' AND user.surname = ?' : ' WHERE user.surname = ?';
+				values.push(data.surname);
+			}
+			if (data.city !== undefined) {
+				condition = (condition) ? condition + ' AND user.city = ?' : ' WHERE user.city = ?';
+				values.push(data.city);
+			}
+			if (data.minBirthday !== undefined) {
+				condition = (condition) ? condition + ' AND user.birthday >= ?' : ' WHERE user.birthday >= ?';
+				values.push(data.minBirthday);
+			}
+			if (data.maxBirthday !== undefined) {
+				condition = (condition) ? condition + ' AND user.birthday <= ?' : ' WHERE user.birthday <= ?';
+				values.push(data.maxBirthday);
+			}
+
+			values.push(limit);
+			values.push(offset);
+
+			const query: string = 'SELECT user.id, user.name, user.surname, user.city, user.birthday, '
+				+ 'file.path AS avatarPath FROM user LEFT JOIN file ON user.id_file_avatar = file.id'
+				+ condition + ' ORDER BY user.id LIMIT ? OFFSET ?';
+
+			connection.query(query, values, (queryErr: mysql.MysqlError | null, queryResult: any) => {
+				connection.release();
+				if (queryErr) {
+					console.log(queryErr);
+					return callback(ResultCode.INTERNAL_ERROR);
+				}
+				callback(ResultCode.OK, queryResult);
+			});
+		});
+	}
+
+	public static saveFile(userId: number, name: string, path: string, callback: (result: ResultCode) => void): void {
+		DB._pool.getConnection((err: Error, connection: mysql.PoolConnection) => {
+			if (err) {
+				callback(ResultCode.INTERNAL_ERROR);
+			}
+
+			const fileInfo: object = {
+				id: null,
+				id_user: userId,
+				name: name,
+				path: path
+			};
+
+			const query: string = 'INSERT INTO file SET ?';
+			connection.query(query, fileInfo, (queryErr: mysql.MysqlError | null) => {
+				connection.release();
+				if (queryErr) {
+					return callback(ResultCode.INTERNAL_ERROR);
+				}
+				callback(ResultCode.OK);
+			});
+		});
+	}
 
 	public static editUserInfo(user: User, callback: (result: ResultCode) => void): void {
 		const newData: object = {
@@ -25,7 +99,7 @@ export default class DB {
 		DB.updateUser(user.id, newData, callback);
 	}
 
-	public static updateUser(id: number, dataMap: object, callback: (result: ResultCode) => void): void {
+	private static updateUser(id: number, dataMap: object, callback: (result: ResultCode) => void): void {
 		DB._pool.getConnection((err: Error, connection: mysql.PoolConnection) => {
 			if (err) {
 				callback(ResultCode.INTERNAL_ERROR);
@@ -48,8 +122,8 @@ export default class DB {
 				callback(ResultCode.INTERNAL_ERROR);
 			}
 
-			const query: string = 'SELECT user.id, user.login, user.name, user.surname, user.city, user.birthday, user.about, ' +
-				'file.name AS avatarPath FROM user LEFT JOIN file ON user.id_file_avatar = file.id WHERE user.id = ?';
+			const query: string = 'SELECT user.*, file.path AS avatarPath FROM user ' +
+				'LEFT JOIN file ON user.id_file_avatar = file.id WHERE user.id = ?';
 			connection.query(query, id, (queryErr: mysql.MysqlError | null, queryResult: any) => {
 				connection.release();
 				if (queryErr) {

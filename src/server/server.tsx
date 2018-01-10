@@ -18,13 +18,58 @@ import * as nodePath from 'path';
 import AuthState from '../shared/states/AuthState';
 import UserState from '../shared/states/UserState';
 import EditState from '../shared/states/EditState';
+import * as multiparty from 'multiparty';
+import * as mmmagic from 'mmmagic';
+import SearchData from '../shared/models/SearchData';
+import SearchState from '../shared/states/SearchState';
 
 const app: express.Express = express();
-
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+const imagesPath: string = nodePath.resolve(__dirname, '../../public/images');
 app.use('/assets', express.static(nodePath.resolve(__dirname, '../../public/assets')));
+app.use('/images', express.static(imagesPath));
+
+const isImage: Function = (filePath: string, callback: (image: boolean) => void) => {
+	const magic: mmmagic.Magic = new mmmagic.Magic(mmmagic.MAGIC_MIME_TYPE);
+	magic.detectFile(filePath, (err: Error, result: string) => {
+		if (err) {
+			return callback(false);
+		}
+		return callback(result.startsWith('image'));
+	});
+};
+
+app.post('/api/upload/:token', (req: express.Request, res: express.Response) => {
+	const userId: number = JWT.decodeId(req.params.token);
+	if (userId === undefined) {
+		return res.json(new UserState(ResultCode.TOKEN_REQUIRED));
+	}
+
+	const options: object = {
+		maxFilesSize: Const.maxAvatarSizeBytes,
+		uploadDir: imagesPath
+	};
+	const avatarFieldName: string = 'avatar';
+	const form: multiparty.Form = new multiparty.Form(options);
+	form.parse(req, (err: Error, fields: any, files: any) => {
+		if (err) {
+			if (err.hasOwnProperty('code') && (err as any).code === 'ETOOBIG') {
+				return res.json(ResultCode.FILE_TOO_LARGE);
+			}
+			return res.json(ResultCode.FILE_UPLOAD_ABORTED);
+		}
+		if (!files || !files[avatarFieldName] || !files[avatarFieldName][0]) {
+			return res.json(ResultCode.FILE_UPLOAD_ABORTED);
+		}
+
+		const file: multiparty.File = files[avatarFieldName][0];
+		isImage(file.path, (image: boolean) => {
+			res.json(image ? ResultCode.OK : ResultCode.FILE_TYPE_UNSUPPORTED);
+		});
+	});
+});
 
 app.post('/api/users/sign_up', (req: express.Request, res: express.Response) => {
 	if (!req.body || !req.body.login || !req.body.password || !req.body.name || !req.body.surname) {
@@ -59,8 +104,7 @@ app.post('/api/users/sign_in', (req: express.Request, res: express.Response) => 
 app.get('/api/users/:id/:token', (req: express.Request, res: express.Response) => {
 	const userId: number = JWT.decodeId(req.params.token);
 	if (userId === undefined) {
-		res.json(new UserState(ResultCode.TOKEN_REQUIRED));
-		return;
+		return res.json(new UserState(ResultCode.TOKEN_REQUIRED));
 	}
 
 	DB.getUserById(req.params.id, (result: ResultCode, user?: User) => {
@@ -71,11 +115,44 @@ app.get('/api/users/:id/:token', (req: express.Request, res: express.Response) =
 	});
 });
 
+app.get('/api/search/:token', (req: express.Request, res: express.Response) => {
+	const userId: number = JWT.decodeId(req.params.token);
+	if (userId === undefined) {
+		return res.json(new SearchState(ResultCode.TOKEN_REQUIRED));
+	}
+
+	const limit: number = parseInt(req.query.limit, 10);
+	const offset: number = parseInt(req.query.offset, 10);
+	if (Number.isNaN(limit) || Number.isNaN(offset)) {
+		return res.json(new SearchState(ResultCode.INVALID_BODY));
+	}
+
+	let minAge: number = parseInt(req.query.minAge, 10);
+	let maxAge: number = parseInt(req.query.maxAge, 10);
+	minAge = (!Number.isNaN(minAge)) ? minAge : undefined;
+	maxAge = (!Number.isNaN(maxAge)) ? maxAge : undefined;
+
+	const nowDate: Date = new Date(Date.now());
+	const maxBirthday: number = (minAge !== undefined)
+		? Date.UTC(nowDate.getUTCFullYear() - minAge, nowDate.getUTCMonth(), nowDate.getUTCDay())
+		: undefined;
+	const minBirthday: number = (maxAge !== undefined)
+		? Date.UTC(nowDate.getUTCFullYear() - maxAge - 1, nowDate.getUTCMonth(), nowDate.getUTCDay() + 1)
+		: undefined;
+
+	const searchData: SearchData = new SearchData(
+		req.query.name, req.query.surname, req.query.city, minBirthday, maxBirthday
+	);
+
+	DB.searchUsers(searchData, limit, offset, (result: ResultCode, users?: User[]) => {
+		res.json(new SearchState(result, users));
+	});
+});
+
 app.get('/api/edit/:token', (req: express.Request, res: express.Response) => {
 	const userId: number = JWT.decodeId(req.params.token);
 	if (userId === undefined) {
-		res.json(new EditState(ResultCode.TOKEN_REQUIRED));
-		return;
+		return res.json(new EditState(ResultCode.TOKEN_REQUIRED));
 	}
 
 	DB.getUserById(userId, (result: ResultCode, user?: User) => {
@@ -110,16 +187,16 @@ app.get('*', (req: express.Request, res: express.Response) => {
 		const store: Store<any> = createStore(reducers, {}, applyMiddleware(thunk));
 		let foundPath: match<any> = null;
 		routeOptions.routes.find(
-				({ path, exact }: any) => {
-					foundPath = matchPath(req.url,
-						{
-							path,
-							exact,
-							strict: false
-						}
-					);
-					return (foundPath !== undefined);
-				});
+			({ path, exact }: any) => {
+				foundPath = matchPath(req.url,
+					{
+						path,
+						exact,
+						strict: false
+					}
+				);
+				return (foundPath !== undefined);
+			});
 
 		const context: any = {};
 		const html: string = ReactDOMServer.renderToString(

@@ -40,7 +40,7 @@
 		],
 		"member-ordering": false,
 		"no-console": [
-			true,
+			false,
 			"log",
 			"error"
 		],

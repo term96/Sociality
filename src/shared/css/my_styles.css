@@ -5,3 +5,8 @@
 .no-top-margin {
     margin-top: 0;
 }
+
+.avatar-preview {
+    width: 100%;
+    max-width: 256px;
+}

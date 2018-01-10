@@ -18,6 +18,12 @@ export default class MessageProvider {
 				return Message.CONNECTION_ERROR as string;
 			case ResultCode.TOKEN_REQUIRED:
 				return Message.TOKEN_REQUIRED as string;
+			case ResultCode.FILE_TOO_LARGE:
+			return Message.FILE_TOO_LARGE as string;
+			case ResultCode.FILE_TYPE_UNSUPPORTED:
+				return Message.FILE_TYPE_UNSUPPORTED as string;
+			case ResultCode.FILE_UPLOAD_ABORTED:
+				return Message.FILE_UPLOAD_ABORTED as string;
 			default:
 				return Message.OK as string;
 		}

@@ -7,7 +7,7 @@ import UserState from '../../states/UserState';
 import UserInfoPanel from './UserInfoPanel';
 import AuthState from '../../states/AuthState';
 import LoadingAlert from '../alerts/LoadingAlert';
-import ResultAlert from '../alerts/ResultAlert';
+import InfoAlert from '../alerts/InfoAlert';
 import { ResultCode } from '../../ResultCode';
 
 interface IUserPageProps extends React.ClassAttributes<UserPage> {
@@ -39,7 +39,7 @@ class UserPage extends React.Component<IUserPageProps, {}> {
 
 		if (props.userState.resultCode !== undefined && props.userState.resultCode !== ResultCode.OK) {
 			return (
-				<ResultAlert resultCode={props.userState.resultCode} />
+				<InfoAlert resultCode={props.userState.resultCode} />
 			);
 		}
 
@@ -50,9 +50,7 @@ class UserPage extends React.Component<IUserPageProps, {}> {
 		}
 
 		return (
-			<div>
-				<UserInfoPanel userState={props.userState} />
-			</div>
+			<UserInfoPanel userState={props.userState} />
 		);
 	}
 }

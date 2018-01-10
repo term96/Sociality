@@ -12,7 +12,8 @@ import * as EditActions from '../../redux/actions/EditActions';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import AdvancedDatePicker from './AdvancedDatePicker';
-import ResultAlert from '../alerts/ResultAlert';
+import InfoAlert from '../alerts/InfoAlert';
+import * as Row from 'react-bootstrap/lib/Row';
 
 interface IInfoEditFormProps extends React.ClassAttributes<InfoEditForm> {
 	editState: EditState;
@@ -36,9 +37,9 @@ class InfoEditForm extends React.Component<IInfoEditFormProps, IInfoEditFormStat
 		this.state = {
 			name: props.editState.name,
 			surname: props.editState.surname,
-			city: props.editState.city,
+			city: props.editState.city || '',
 			birthday: props.editState.birthday,
-			about: props.editState.about,
+			about: props.editState.about || '',
 			submittable: InfoEditForm.isSubmittable(props.editState.name, props.editState.surname),
 			showResult: false
 		};
@@ -142,7 +143,7 @@ class InfoEditForm extends React.Component<IInfoEditFormProps, IInfoEditFormStat
 		const props: IInfoEditFormProps = this.props;
 		const resultCode: number = props.editState.resultCode;
 		const result: JSX.Element = (state.showResult)
-			? <Col sm={10} smOffset={2}><ResultAlert resultCode={resultCode} /></Col>
+			? <Row><Col sm={10} smOffset={2}><InfoAlert resultCode={resultCode}/></Col></Row>
 			: null;
 		return (
 			<Form horizontal>
@@ -171,9 +172,11 @@ class InfoEditForm extends React.Component<IInfoEditFormProps, IInfoEditFormStat
 					</Col>
 				</FormGroup>
 
-				<Col sm={10} smOffset={2}>
-					<Button type='submit' disabled={!state.submittable} onClick={this.onSubmit}>Изменить</Button>
-				</Col>
+				<Row>
+					<Col sm={10} smOffset={2}>
+						<Button type='submit' disabled={!state.submittable} onClick={this.onSubmit}>Изменить</Button>
+					</Col>
+				</Row>
 				{result}
 			</Form>
 		);
