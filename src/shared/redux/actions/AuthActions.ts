@@ -1,6 +1,7 @@
 import axios, { AxiosResponse } from 'axios';
 import { ActionTypes } from './ActionTypes';
-import { Result } from '../../Result';
+import { ResultCode } from '../../ResultCode';
+import AuthState from '../../states/AuthState';
 
 export const signUp: any = (login: string, password: string, name: string, surname: string) => {
 	return (dispatch: Function) => {
@@ -20,9 +21,7 @@ export const signUp: any = (login: string, password: string, name: string, surna
 		}).catch(() => {
 			dispatch({
 				type: ActionTypes.SIGN_UP,
-				payload: {
-					errorNumber: Result.CONNECTION_ERROR
-				}
+				payload: new AuthState(ResultCode.CONNECTION_ERROR)
 			});
 		});
 	};
@@ -44,9 +43,7 @@ export const signIn: any = (login: string, password: string) => {
 		}).catch(() => {
 			dispatch({
 				type: ActionTypes.SIGN_IN,
-				payload: {
-					errorNumber: Result.CONNECTION_ERROR
-				}
+				payload: new AuthState(ResultCode.CONNECTION_ERROR)
 			});
 		});
 	};

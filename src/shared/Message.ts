@@ -5,5 +5,9 @@ export enum Message {
 	WRONG_PASSWORD = 'Неверный пароль',
 	INVALID_BODY = 'Заполнены не все поля',
 	CONNECTION_ERROR = 'Ошибка соединения с сервером, проверьте подключение к Интернету',
-	TOKEN_REQUIRED = 'Войдите в систему'
+	TOKEN_REQUIRED = 'Войдите в систему',
+	OK = 'Успешно выполнено',
+	FILE_TOO_LARGE = 'Слишком большой файл',
+	FILE_TYPE_UNSUPPORTED = 'Тип файла не поддерживается',
+	FILE_UPLOAD_ABORTED = 'Загрузка файла прервана'
 }

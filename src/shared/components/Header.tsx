@@ -10,11 +10,11 @@ import AppState from '../redux/AppState';
 import * as Col from 'react-bootstrap/lib/Col';
 import PageRoutes from '../routes/PageRoutes';
 
-interface IHeaderProps {
+interface IHeaderProps extends React.ClassAttributes<Header> {
 	authState?: AuthState;
 }
 
-export class Header extends React.Component<IHeaderProps, {}> {
+class Header extends React.Component<IHeaderProps> {
 	render(): JSX.Element {
 		const props: IHeaderProps = this.props as IHeaderProps;
 		const myPageLink: string = PageRoutes.user + `/${props.authState.id}`;
@@ -55,4 +55,4 @@ const mapStateToProps: any = (state: AppState) => {
 	};
 };
 
-export default connect(mapStateToProps, null, null)(Header);
+export default connect(mapStateToProps, null)(Header);

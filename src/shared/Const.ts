@@ -8,4 +8,5 @@ export default class Const {
 	public static readonly dbName: string = 'sociality';
 	public static readonly storageToken: string = 'SOCIALITY_TOKEN';
 	public static readonly storageId: string = 'SOCIALITY_ID';
+	public static readonly maxAvatarSizeBytes: number = 2 * 1024 * 1024;
 }

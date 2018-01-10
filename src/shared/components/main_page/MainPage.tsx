@@ -7,7 +7,7 @@ import { default as SignUpForm } from './SignUpForm';
 import { default as SignInForm } from './SignInForm';
 import PageRoutes from '../../routes/PageRoutes';
 
-interface IMainPageProps {
+interface IMainPageProps extends React.ClassAttributes<MainPage> {
 	authState: AuthState;
 }
 
@@ -43,6 +43,7 @@ class MainPage extends React.Component<IMainPageProps, IMainPageState> {
 	}
 
 	onSignInChosen(e: React.MouseEvent<HTMLAnchorElement>): void {
+		e.preventDefault();
 		this.setState((prevState: IMainPageState) => {
 			return {
 				...prevState,
@@ -52,6 +53,7 @@ class MainPage extends React.Component<IMainPageProps, IMainPageState> {
 	}
 
 	onSignUpChosen(e: React.MouseEvent<HTMLAnchorElement>): void {
+		e.preventDefault();
 		this.setState((prevState: IMainPageState) => {
 			return {
 				...prevState,
@@ -67,4 +69,4 @@ const mapStateToProps: any = (state: AppState) => {
 	};
 };
 
-export default connect(mapStateToProps, null, null)(MainPage);
+export default connect(mapStateToProps, null)(MainPage);

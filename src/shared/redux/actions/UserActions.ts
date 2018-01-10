@@ -1,10 +1,14 @@
 import axios, { AxiosResponse } from 'axios';
 import { ActionTypes } from './ActionTypes';
-import { Result } from '../../Result';
+import { ResultCode } from '../../ResultCode';
+import UserState from '../../states/UserState';
 
-export const getUserInfo: any = (id: number) => {
+export const getUserInfo: any = (id: number, token: string) => {
 	return (dispatch: Function) => {
-		axios.get(`/api/users/${id}`).then((response: AxiosResponse) => {
+		dispatch({
+			type: ActionTypes.RESET_USER_INFO
+		});
+		axios.get(`/api/users/${id}/${token}`).then((response: AxiosResponse) => {
 			dispatch({
 				type: ActionTypes.GET_USER_INFO,
 				payload: {
@@ -14,9 +18,7 @@ export const getUserInfo: any = (id: number) => {
 		}).catch(() => {
 			dispatch({
 				type: ActionTypes.GET_USER_INFO,
-				payload: {
-					errorNumber: Result.CONNECTION_ERROR
-				}
+				payload: new UserState(ResultCode.CONNECTION_ERROR)
 			});
 		});
 	};

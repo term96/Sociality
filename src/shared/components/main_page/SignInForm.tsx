@@ -12,10 +12,11 @@ import { connect } from 'react-redux';
 import * as Form from 'react-bootstrap/lib/Form';
 import * as FormGroup from 'react-bootstrap/lib/FormGroup';
 import * as Col from 'react-bootstrap/lib/Col';
+import * as Row from 'react-bootstrap/lib/Row';
 
-interface ISignInFormProps {
+interface ISignInFormProps extends React.ClassAttributes<SignInForm> {
 	authState?: AuthState;
-	signIn?: Function;
+	signIn?: (login: string, password: string) => void;
 }
 
 interface ISignInFormState {
@@ -74,33 +75,37 @@ class SignInForm extends React.Component<ISignInFormProps, ISignInFormState> {
 			};
 		});
 		const state: ISignInFormState = this.state as ISignInFormState;
-		const props: ISignInFormProps = this.props as ISignInFormProps;
+		const props: ISignInFormProps = this.props;
 		props.signIn(state.login, state.password);
 	}
 
 	render(): JSX.Element {
 		const state: ISignInFormState = this.state as ISignInFormState;
-		const props: ISignInFormProps = this.props as ISignInFormProps;
-		const errorNumber: number = props.authState.errorNumber;
+		const props: ISignInFormProps = this.props;
+		const errorNumber: number = props.authState.resultCode;
 		const errorText: JSX.Element =
 			errorNumber && state.showError ? <p>{MessageProvider.getMessage(errorNumber)}</p> : null;
 		return (
 			<div>
 				<Form horizontal>
 					<FormGroup>
-						<Col sm={2} componentClass={ControlLabel}>Login</Col>
-						<Col sm={10}><FormControl onChange={this.onLoginChange} /></Col>
+						<Col sm={2} componentClass={ControlLabel}>Логин:</Col>
+						<Col sm={10}><FormControl onChange={this.onLoginChange}/></Col>
 					</FormGroup>
 					<FormGroup>
-						<Col sm={2} componentClass={ControlLabel}>Password</Col>
-						<Col sm={10}><FormControl onChange={this.onPasswordChange} /></Col>
+						<Col sm={2} componentClass={ControlLabel}>Пароль:</Col>
+						<Col sm={10}><FormControl onChange={this.onPasswordChange}/></Col>
 					</FormGroup>
-					<Col sm={10} smOffset={2}>
-						<Button type='submit' disabled={!state.submittable} onClick={this.onSubmit}>Send</Button>
-					</Col>
-					<Col sm={10} smOffset={2}>
-						{errorText}
-					</Col>
+					<Row>
+						<Col sm={10} smOffset={2}>
+							<Button type='submit' disabled={!state.submittable} onClick={this.onSubmit}>Войти</Button>
+						</Col>
+					</Row>
+					<Row>
+						<Col sm={10} smOffset={2}>
+							{errorText}
+						</Col>
+					</Row>
 				</Form>
 			</div>
 		);

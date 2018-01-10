@@ -5,12 +5,12 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import PageRoutes from '../routes/PageRoutes';
 
-interface ISignOutPageProps {
-	signOut: Function;
+interface ISignOutPageProps extends React.ClassAttributes<SignOutPage> {
+	signOut: () => void;
 }
 
-class SignOutPage extends React.Component<ISignOutPageProps, {}> {
-	componentWillMount(): void {
+class SignOutPage extends React.Component<ISignOutPageProps> {
+	componentDidMount(): void {
 		const props: ISignOutPageProps = this.props;
 		props.signOut();
 	}

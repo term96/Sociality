@@ -1,8 +1,8 @@
 import { ResultCode } from '../ResultCode';
 
-export default class UserState {
+export default class EditState {
 	public resultCode?: ResultCode;
-	public id?: number;
+	public login?: string;
 	public name?: string;
 	public surname?: string;
 	public city?: string;
@@ -10,10 +10,10 @@ export default class UserState {
 	public about?: string;
 	public avatarPath?: string;
 
-	constructor(resultCode?: ResultCode, id?: number, name?: string, surname?: string, city?: string, birthday?: number,
-			about?: string, avatarPath?: string) {
+	public constructor(resultCode?: ResultCode, login?: string, name?: string, surname?: string,
+			city?: string, birthday?: number, about?: string, avatarPath?: string) {
 		this.resultCode = resultCode;
-		this.id = id;
+		this.login = login;
 		this.name = name;
 		this.surname = surname;
 		this.city = city;

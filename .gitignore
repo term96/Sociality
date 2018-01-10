@@ -20,4 +20,4 @@
 *.db
 
 # Assets
-**/public/assets/
+**/public/
