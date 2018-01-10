@@ -1,6 +1,7 @@
 import UserPage from '../components/user_page/UserPage';
 import MainPage from '../components/main_page/MainPage';
 import EditPage from '../components/edit_page/EditPage';
+import FriendsPage from '../components/friends_page/FriendsPage';
 import SearchPage from '../components/search_page/SearchPage';
 import NotFoundPage from '../components/NotFoundPage';
 import SignOutPage from '../components/SignOutPage';
@@ -31,6 +32,11 @@ export default {
 		{
 			path: PageRoutes.search,
 			component: SearchPage,
+			exact: true
+		},
+		{
+			path: PageRoutes.friends,
+			component: FriendsPage,
 			exact: true
 		},
 		{

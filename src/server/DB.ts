@@ -14,6 +14,78 @@ export default class DB {
 		database: Const.dbName
 	});
 
+	public static getFriends(userId: number, callback: (result: ResultCode, friends?: User[]) => void): void {
+		DB._pool.getConnection((err: Error, connection: mysql.PoolConnection) => {
+			if (err) {
+				callback(ResultCode.INTERNAL_ERROR);
+			}
+			const query: string = 'SELECT user.id, user.name, user.surname, user.city, user.birthday, '
+				+ 'file.path AS avatarPath FROM user LEFT JOIN file ON user.id_file_avatar = file.id '
+				+ 'WHERE user.id IN (SELECT id_friend FROM user_friend WHERE id_user = ?)';
+			connection.query(query, userId, (queryErr: mysql.MysqlError | null, queryResult: User[]) => {
+				connection.release();
+				if (queryErr) {
+					callback(ResultCode.INTERNAL_ERROR);
+				}
+				callback(ResultCode.OK, queryResult);
+			});
+		});
+	}
+
+	public static deleteFriend(userId: number, friendId: number, callback: (result: ResultCode) => void): void {
+		DB._pool.getConnection((err: Error, connection: mysql.PoolConnection) => {
+			if (err) {
+				callback(ResultCode.INTERNAL_ERROR);
+			}
+			const query: string = 'DELETE FROM user_friend WHERE id_user = ? AND id_friend = ?';
+			connection.query(query, [userId, friendId], (queryErr: mysql.MysqlError | null) => {
+				connection.release();
+				if (queryErr) {
+					callback(ResultCode.INTERNAL_ERROR);
+				}
+				callback(ResultCode.OK);
+			});
+		});
+	}
+
+	public static addFriend(userId: number, friendId: number, callback: (result: ResultCode) => void): void {
+		DB._pool.getConnection((err: Error, connection: mysql.PoolConnection) => {
+			if (err) {
+				callback(ResultCode.INTERNAL_ERROR);
+			}
+			const data: object = {
+				id: null,
+				id_user: userId,
+				id_friend: friendId
+			};
+			const query: string = 'INSERT INTO user_friend SET ?';
+			connection.query(query, data, (queryErr: mysql.MysqlError | null) => {
+				connection.release();
+				if (queryErr) {
+					callback(ResultCode.INTERNAL_ERROR);
+				}
+				callback(ResultCode.OK);
+			});
+		});
+	}
+
+	public static isFriend(
+			userId: number, friendId: number, callback: (result: ResultCode, friend?: boolean) => void): void {
+		DB._pool.getConnection((err: Error, connection: mysql.PoolConnection) => {
+			if (err) {
+				callback(ResultCode.INTERNAL_ERROR);
+			}
+			const query: string = 'SELECT COUNT(*) AS count FROM user_friend WHERE id_user = ? AND id_friend = ?';
+			connection.query(query, [userId, friendId], (queryErr: mysql.MysqlError | null, queryResult: any) => {
+				connection.release();
+				if (queryErr) {
+					callback(ResultCode.INTERNAL_ERROR);
+				}
+				callback(ResultCode.OK, queryResult[0].count !== 0);
+			});
+		});
+	}
+
 	public static searchUsers(data: SearchData, limit: number, offset: number,
 			callback: (result: ResultCode, users?: User[]) => void): void {
 		DB._pool.getConnection((err: Error, connection: mysql.PoolConnection) => {
@@ -53,7 +125,6 @@ export default class DB {
 				+ condition + ' ORDER BY user.id LIMIT ? OFFSET ?';
 
 			connection.query(query, values, (queryErr: mysql.MysqlError | null, queryResult: any) => {
-				connection.release();
 				if (queryErr) {
 					console.log(queryErr);
 					return callback(ResultCode.INTERNAL_ERROR);

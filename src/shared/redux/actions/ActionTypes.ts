@@ -9,6 +9,9 @@ export const enum ActionTypes {
 	LOAD_SEARCH_DATA,
 	RESET_SEARCH_DATA,
 
+	LOAD_FRIENDS_LIST,
+	RESET_FRIENDS_LIST,
+
 	SIGN_UP,
 	SIGN_IN ,
 	SIGN_OUT

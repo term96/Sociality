@@ -3,7 +3,7 @@ import SearchState from '../../states/SearchState';
 import * as ListGroup from 'react-bootstrap/lib/ListGroup';
 import { ResultCode } from '../../ResultCode';
 import InfoAlert from '../alerts/InfoAlert';
-import ShortUserInfo from './ShortUserInfo';
+import ShortUserInfo from '../ShortUserInfo';
 import User from '../../models/User';
 import * as Button from 'react-bootstrap/lib/Button';
 

@@ -22,6 +22,7 @@ import * as multiparty from 'multiparty';
 import * as mmmagic from 'mmmagic';
 import SearchData from '../shared/models/SearchData';
 import SearchState from '../shared/states/SearchState';
+import FriendsState from '../shared/states/FriendsState';
 
 const app: express.Express = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -112,6 +113,72 @@ app.get('/api/users/:id/:token', (req: express.Request, res: express.Response) =
 			? new UserState(result, user.id, user.name, user.surname, user.city, user.birthday, user.about, user.avatarPath)
 			: new UserState(result);
 		res.json(response);
+	});
+});
+
+app.post('/api/friends/delete/:token', (req: express.Request, res: express.Response) => {
+	const userId: number = JWT.decodeId(req.params.token);
+	if (userId === undefined) {
+		return res.json(new SearchState(ResultCode.TOKEN_REQUIRED));
+	}
+
+	const friendId: number = parseInt(req.body.friendId, 10);
+	if (Number.isNaN(friendId)) {
+		return res.json(new SearchState(ResultCode.INVALID_BODY));
+	}
+
+	DB.deleteFriend(userId, friendId, (result: ResultCode) => {
+		return res.json({
+			resultCode: result
+		});
+	});
+});
+
+app.post('/api/friends/add/:token', (req: express.Request, res: express.Response) => {
+	const userId: number = JWT.decodeId(req.params.token);
+	if (userId === undefined) {
+		return res.json(new SearchState(ResultCode.TOKEN_REQUIRED));
+	}
+
+	const friendId: number = parseInt(req.body.friendId, 10);
+	if (Number.isNaN(friendId)) {
+		return res.json(new SearchState(ResultCode.INVALID_BODY));
+	}
+
+	DB.addFriend(userId, friendId, (result: ResultCode) => {
+		return res.json({
+			resultCode: result
+		});
+	});
+});
+
+app.get('/api/friends/check/:token', (req: express.Request, res: express.Response) => {
+	const userId: number = JWT.decodeId(req.params.token);
+	if (userId === undefined) {
+		return res.json(new SearchState(ResultCode.TOKEN_REQUIRED));
+	}
+
+	const friendId: number = parseInt(req.query.friendId, 10);
+	if (Number.isNaN(friendId)) {
+		return res.json(new SearchState(ResultCode.INVALID_BODY));
+	}
+
+	DB.isFriend(userId, friendId, (result: ResultCode, friend?: boolean) => {
+		return res.json({
+			resultCode: result,
+			friend: friend
+		});
+	});
+});
+
+app.get('/api/friends/:token', (req: express.Request, res: express.Response) => {
+	const userId: number = JWT.decodeId(req.params.token);
+	if (userId === undefined) {
+		return res.json(new SearchState(ResultCode.TOKEN_REQUIRED));
+	}
+
+	DB.getFriends(userId, (result: ResultCode, friends?: User[]) => {
+		res.json(new FriendsState(result, friends));
 	});
 });
 

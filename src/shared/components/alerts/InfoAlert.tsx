@@ -7,6 +7,7 @@ interface IInfoAlertProps extends React.ClassAttributes<InfoAlert> {
 	resultCode?: number;
 	message?: string;
 	type?: string;
+	className?: string;
 }
 
 export default class InfoAlert extends React.Component<IInfoAlertProps> {
@@ -30,7 +31,7 @@ export default class InfoAlert extends React.Component<IInfoAlertProps> {
 			: props.message;
 
 		return (
-			<Alert bsStyle={style}>{message}</Alert>
+			<Alert className={props.className} bsStyle={style}>{message}</Alert>
 		);
 	}
 }

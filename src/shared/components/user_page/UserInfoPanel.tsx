@@ -3,9 +3,12 @@ import UserState from '../../states/UserState';
 import * as Col from 'react-bootstrap/lib/Col';
 import * as Image from 'react-bootstrap/lib/Image';
 import * as Row from 'react-bootstrap/lib/Row';
+import FriendButton from './FriendButton';
+import AuthState from '../../states/AuthState';
 
 interface IUserInfoPanelProps extends React.ClassAttributes<UserInfoPanel> {
 	userState: UserState;
+	authState: AuthState;
 }
 
 export default class UserInfoPanel extends React.Component<IUserInfoPanelProps, {}> {
@@ -18,11 +21,15 @@ export default class UserInfoPanel extends React.Component<IUserInfoPanelProps, 
 			? <p>День рождения: {new Date(props.userState.birthday).toLocaleDateString()}</p>
 			: null;
 		const about: JSX.Element = (props.userState.about) ? <p>О себе: {props.userState.about}</p> : null;
+		const friendsButton: JSX.Element = (props.authState.id !== props.userState.id)
+			? <Row><Col sm={6} smOffset={3}><FriendButton id={props.userState.id} token={props.authState.token} /></Col></Row>
+			: null;
 
 		return (
 			<Row>
 				<Col sm={4}>
-					<Image className='full-width' src={avatarPath} rounded responsive />
+					<Row><Image className='full-width' src={avatarPath} rounded responsive /></Row>
+					{friendsButton}
 				</Col>
 				<Col sm={8}>
 					{name}

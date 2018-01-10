@@ -1,10 +1,10 @@
 import * as React from 'react';
-import User from '../../models/User';
+import User from '../models/User';
 import * as Col from 'react-bootstrap/lib/Col';
 import * as Row from 'react-bootstrap/lib/Row';
 import * as Image from 'react-bootstrap/lib/Image';
 import { Link } from 'react-router-dom';
-import PageRoutes from '../../routes/PageRoutes';
+import PageRoutes from '../routes/PageRoutes';
 
 interface IShortUserInfoProps extends React.ClassAttributes<ShortUserInfo> {
 	user: User;

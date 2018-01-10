@@ -50,7 +50,7 @@ class UserPage extends React.Component<IUserPageProps, {}> {
 		}
 
 		return (
-			<UserInfoPanel userState={props.userState} />
+			<UserInfoPanel userState={props.userState} authState={props.authState} />
 		);
 	}
 }

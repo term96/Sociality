@@ -3,10 +3,12 @@ import UserReducer from './UserReducer';
 import AuthReducer from './AuthReducer';
 import EditReducer from './EditReducer';
 import SearchReducer from './SearchReducer';
+import FriendsReducer from './FriendsReducer';
 
 export default combineReducers({
 	authState: AuthReducer,
 	userState: UserReducer,
 	editState: EditReducer,
-	searchState: SearchReducer
+	searchState: SearchReducer,
+	friendsState: FriendsReducer
 });
