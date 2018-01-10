@@ -66,8 +66,21 @@ app.post('/api/upload/:token', (req: express.Request, res: express.Response) => 
 		}
 
 		const file: multiparty.File = files[avatarFieldName][0];
+		const path: string = nodePath.basename(file.path);
+
 		isImage(file.path, (image: boolean) => {
-			res.json(image ? ResultCode.OK : ResultCode.FILE_TYPE_UNSUPPORTED);
+			if (image) {
+				DB.saveFile(path, (result: ResultCode, avatarId?: number) => {
+					if (result !== ResultCode.OK) {
+						return res.json(result);
+					}
+					DB.setAvatar(userId, avatarId, (result2: ResultCode) => {
+						res.json(result2);
+					});
+				});
+			} else {
+				res.json(ResultCode.FILE_TYPE_UNSUPPORTED);
+			}
 		});
 	});
 });

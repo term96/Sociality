@@ -14,6 +14,10 @@ export default class DB {
 		database: Const.dbName
 	});
 
+	public static createDialog(name: string, userId: number, callback: (result: ResultCode) => void): void {
+		return;
+	}
+
 	public static getFriends(userId: number, callback: (result: ResultCode, friends?: User[]) => void): void {
 		DB._pool.getConnection((err: Error, connection: mysql.PoolConnection) => {
 			if (err) {
@@ -134,7 +138,24 @@ export default class DB {
 		});
 	}
 
-	public static saveFile(userId: number, name: string, path: string, callback: (result: ResultCode) => void): void {
+	public static setAvatar(userId: number, avatarId: number, callback: (result: ResultCode) => void): void {
+		DB._pool.getConnection((err: Error, connection: mysql.PoolConnection) => {
+			if (err) {
+				callback(ResultCode.INTERNAL_ERROR);
+			}
+
+			const query: string = 'UPDATE user SET id_file_avatar = ? WHERE id = ?';
+			connection.query(query, [avatarId, userId], (queryErr: mysql.MysqlError | null) => {
+				connection.release();
+				if (queryErr) {
+					return callback(ResultCode.INTERNAL_ERROR);
+				}
+				callback(ResultCode.OK);
+			});
+		});
+	}
+
+	public static saveFile(path: string, callback: (result: ResultCode, id?: number) => void): void {
 		DB._pool.getConnection((err: Error, connection: mysql.PoolConnection) => {
 			if (err) {
 				callback(ResultCode.INTERNAL_ERROR);
@@ -142,18 +163,16 @@ export default class DB {
 
 			const fileInfo: object = {
 				id: null,
-				id_user: userId,
-				name: name,
 				path: path
 			};
 
 			const query: string = 'INSERT INTO file SET ?';
-			connection.query(query, fileInfo, (queryErr: mysql.MysqlError | null) => {
+			connection.query(query, fileInfo, (queryErr: mysql.MysqlError | null, queryResult: any) => {
 				connection.release();
 				if (queryErr) {
 					return callback(ResultCode.INTERNAL_ERROR);
 				}
-				callback(ResultCode.OK);
+				callback(ResultCode.OK, queryResult.insertId);
 			});
 		});
 	}

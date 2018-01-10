@@ -22,10 +22,11 @@ export default class ShortUserInfo extends React.Component<IShortUserInfoProps> 
 		const birthday: JSX.Element = (user.birthday)
 			? <p>День рождения: {new Date(user.birthday).toLocaleDateString()}</p>
 			: null;
+		const avatarSrc: string = `/images/${user.avatarPath}`;
 		return (
 			<Row>
 				<Col sm={4}>
-					<Image className='full-width' src={user.avatarPath} rounded responsive/>
+					<Image className='full-width' src={avatarSrc} rounded responsive/>
 				</Col>
 				<Col sm={8}>
 					{name}
