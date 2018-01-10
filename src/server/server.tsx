@@ -23,6 +23,8 @@ import * as mmmagic from 'mmmagic';
 import SearchData from '../shared/models/SearchData';
 import SearchState from '../shared/states/SearchState';
 import FriendsState from '../shared/states/FriendsState';
+import Conversation from '../shared/models/Conversation';
+import ConversationsState from '../shared/states/ConversationsState';
 
 const app: express.Express = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -45,7 +47,7 @@ const isImage: Function = (filePath: string, callback: (image: boolean) => void)
 app.post('/api/upload/:token', (req: express.Request, res: express.Response) => {
 	const userId: number = JWT.decodeId(req.params.token);
 	if (userId === undefined) {
-		return res.json(new UserState(ResultCode.TOKEN_REQUIRED));
+		return res.json(ResultCode.TOKEN_REQUIRED);
 	}
 
 	const options: object = {
@@ -82,6 +84,37 @@ app.post('/api/upload/:token', (req: express.Request, res: express.Response) => 
 				res.json(ResultCode.FILE_TYPE_UNSUPPORTED);
 			}
 		});
+	});
+});
+
+app.post('/api/conversations/create/:token', (req: express.Request, res: express.Response) => {
+	const userId: number = JWT.decodeId(req.params.token);
+	if (userId === undefined) {
+		return res.json(ResultCode.TOKEN_REQUIRED);
+	}
+
+	if (!req.body.name) {
+		return res.json(ResultCode.INVALID_BODY);
+	}
+
+	DB.createConversation(req.body.name, (result: ResultCode, id?: number) => {
+		if (result !== ResultCode.OK) {
+			return res.json(result);
+		}
+		DB.addUserToConversation(userId, id, (result2: ResultCode) => {
+			res.json(result2);
+		});
+	});
+});
+
+app.get('/api/conversations/:token', (req: express.Request, res: express.Response) => {
+	const userId: number = JWT.decodeId(req.params.token);
+	if (userId === undefined) {
+		return res.json(new ConversationsState(ResultCode.TOKEN_REQUIRED));
+	}
+
+	DB.getConversations(userId, (result: ResultCode, conversations: Conversation[]) => {
+		res.json(new ConversationsState(result, conversations));
 	});
 });
 

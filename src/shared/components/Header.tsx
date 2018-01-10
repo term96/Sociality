@@ -23,7 +23,7 @@ class Header extends React.Component<IHeaderProps> {
 				<Nav>
 					<LinkContainer to={myPageLink}><NavItem eventKey='1'>Моя страница</NavItem></LinkContainer>
 					<LinkContainer to={PageRoutes.friends}><NavItem eventKey='2'>Друзья</NavItem></LinkContainer>
-					<LinkContainer to={PageRoutes.dialogs}><NavItem eventKey='3'>Диалоги</NavItem></LinkContainer>
+					<LinkContainer to={PageRoutes.conversations}><NavItem eventKey='3'>Беседы</NavItem></LinkContainer>
 					<LinkContainer to={PageRoutes.files}><NavItem eventKey='4'>Файлы</NavItem></LinkContainer>
 				</Nav>
 				<Nav pullRight>

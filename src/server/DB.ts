@@ -3,6 +3,8 @@ import { ResultCode } from '../shared/ResultCode';
 import * as mysql from 'mysql';
 import Const from '../shared/Const';
 import SearchData from '../shared/models/SearchData';
+import Message from '../shared/models/Message';
+import Conversation from '../shared/models/Conversation';
 
 export default class DB {
 	private static readonly _pool: mysql.Pool = mysql.createPool({
@@ -14,8 +16,137 @@ export default class DB {
 		database: Const.dbName
 	});
 
-	public static createDialog(name: string, userId: number, callback: (result: ResultCode) => void): void {
-		return;
+	public static getConversations(
+			userId: number, callback: (result: ResultCode, conversations?: Conversation[]) => void): void {
+		DB._pool.getConnection((err: Error, connection: mysql.PoolConnection) => {
+			if (err) {
+				callback(ResultCode.INTERNAL_ERROR);
+			}
+			const query: string = 'SELECT conversation.id, conversation.name FROM conversation_user '
+				+ 'JOIN conversation ON conversation_user.id_conversation = conversation.id '
+				+ 'WHERE conversation_user.id_user = ?';
+			connection.query(query, userId, (queryErr: mysql.MysqlError | null, queryResult: any[]) => {
+				connection.release();
+				if (queryErr) {
+					console.log(queryErr);
+					return callback(ResultCode.INTERNAL_ERROR);
+				}
+				const conversations: Conversation[] = queryResult.map((value: any) => {
+					return new Conversation(value.id, value.name, []);
+				});
+				callback(ResultCode.OK, conversations);
+			});
+		});
+	}
+
+	public static getMessages(conversationId: number, callback: (result: ResultCode, messages?: Message[]) => void): void {
+		DB._pool.getConnection((err: Error, connection: mysql.PoolConnection) => {
+			if (err) {
+				callback(ResultCode.INTERNAL_ERROR);
+			}
+			const query: string = 'SELECT message.*, user.name, user.surname, file.path as avatarPath ' +
+				+ 'FROM message JOIN user ON message.id_sender = user.id '
+				+ 'LEFT JOIN file ON user.id_file_avatar = file.id'
+				+ 'WHERE message.id_conversation = ? ORDER BY message.time';
+			connection.query(query, conversationId, (queryErr: mysql.MysqlError | null, queryResult: any[]) => {
+				connection.release();
+				if (queryErr) {
+					callback(ResultCode.INTERNAL_ERROR);
+				}
+				const messages: Message[] = queryResult.map((value: any) => {
+					const message: Message = new Message();
+					message.id = value.id;
+					message.conversationId = value.id_conversation;
+					message.text = value.text;
+					message.time = value.time;
+					message.senderId = value.id_sender;
+					message.senderName = value.name + ' ' + value.surname;
+					message.senderAvatarPath = value.avatarPath;
+					return message;
+				});
+				callback(ResultCode.OK, messages);
+			});
+		});
+	}
+
+	public static addMessage(message: Message, callback: (result: ResultCode) => void): void {
+		DB._pool.getConnection((err: Error, connection: mysql.PoolConnection) => {
+			if (err) {
+				callback(ResultCode.INTERNAL_ERROR);
+			}
+			const data: object = {
+				id: null,
+				id_conversation: message.conversationId,
+				text: message.text,
+				time: message.time,
+				id_sender: message.senderId
+			};
+			const query: string = 'INSERT INTO message SET ?';
+			connection.query(query, data, (queryErr: mysql.MysqlError | null) => {
+				connection.release();
+				if (queryErr) {
+					callback(ResultCode.INTERNAL_ERROR);
+				}
+				callback(ResultCode.OK);
+			});
+		});
+	}
+
+	public static addUserToConversation(userId: number, id: number, callback: (result: ResultCode) => void): void {
+		DB._pool.getConnection((err: Error, connection: mysql.PoolConnection) => {
+			if (err) {
+				callback(ResultCode.INTERNAL_ERROR);
+			}
+			const data: object = {
+				id: null,
+				id_conversation: id,
+				id_user: userId
+			};
+			const query: string = 'INSERT INTO conversation_user SET ?';
+			connection.query(query, data, (queryErr: mysql.MysqlError | null) => {
+				connection.release();
+				if (queryErr) {
+					callback(ResultCode.INTERNAL_ERROR);
+				}
+				callback(ResultCode.OK);
+			});
+		});
+	}
+
+	public static deleteUserFromConversation(userId: number, id: number, callback: (result: ResultCode) => void): void {
+		DB._pool.getConnection((err: Error, connection: mysql.PoolConnection) => {
+			if (err) {
+				callback(ResultCode.INTERNAL_ERROR);
+			}
+			const query: string = 'DELETE FROM conversation_user WHERE id_user = ? AND id_conversation = ?';
+			connection.query(query, [userId, id], (queryErr: mysql.MysqlError | null) => {
+				connection.release();
+				if (queryErr) {
+					callback(ResultCode.INTERNAL_ERROR);
+				}
+				callback(ResultCode.OK);
+			});
+		});
+	}
+
+	public static createConversation(name: string, callback: (result: ResultCode, id?: number) => void): void {
+		DB._pool.getConnection((err: Error, connection: mysql.PoolConnection) => {
+			if (err) {
+				callback(ResultCode.INTERNAL_ERROR);
+			}
+			const data: object = {
+				id: null,
+				name: name
+			};
+			const query: string = 'INSERT INTO conversation SET ?';
+			connection.query(query, data, (queryErr: mysql.MysqlError | null, queryResult: any) => {
+				connection.release();
+				if (queryErr) {
+					callback(ResultCode.INTERNAL_ERROR);
+				}
+				callback(ResultCode.OK, queryResult.insertId);
+			});
+		});
 	}
 
 	public static getFriends(userId: number, callback: (result: ResultCode, friends?: User[]) => void): void {
