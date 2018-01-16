@@ -3,7 +3,7 @@ export enum Message {
 	USER_NOT_FOUND = 'Пользователь не найден',
 	LOGIN_IS_IN_USE = 'Такой логин уже занят',
 	WRONG_PASSWORD = 'Неверный пароль',
-	INVALID_BODY = 'Заполнены не все поля',
+	INVALID_BODY = 'Отправлены некорректные данные',
 	CONNECTION_ERROR = 'Ошибка соединения с сервером, проверьте подключение к Интернету',
 	TOKEN_REQUIRED = 'Войдите в систему',
 	OK = 'Успешно выполнено',

@@ -39,16 +39,25 @@ export default class DB {
 		});
 	}
 
-	public static getMessages(conversationId: number, callback: (result: ResultCode, messages?: Message[]) => void): void {
+	public static getMessages(id: number, oldest: number, limit: number,
+			callback: (result: ResultCode, messages?: Message[]) => void): void {
 		DB._pool.getConnection((err: Error, connection: mysql.PoolConnection) => {
 			if (err) {
 				callback(ResultCode.INTERNAL_ERROR);
 			}
-			const query: string = 'SELECT message.*, user.name, user.surname, file.path as avatarPath ' +
+			const params: any[] = [id];
+			let query: string =
+				'SELECT message.*, user.name, user.surname, file.path as avatarPath '
 				+ 'FROM message JOIN user ON message.id_sender = user.id '
-				+ 'LEFT JOIN file ON user.id_file_avatar = file.id'
-				+ 'WHERE message.id_conversation = ? ORDER BY message.time';
-			connection.query(query, conversationId, (queryErr: mysql.MysqlError | null, queryResult: any[]) => {
+				+ 'LEFT JOIN file ON user.id_file_avatar = file.id '
+				+ 'WHERE message.id_conversation = ? ';
+			if (oldest !== undefined) {
+				query += 'AND message.id < ? ';
+				params.push(oldest);
+			}
+			query += 'ORDER BY message.id DESC LIMIT ?';
+			params.push(limit);
+			connection.query(query, params, (queryErr: mysql.MysqlError | null, queryResult: any[]) => {
 				connection.release();
 				if (queryErr) {
 					callback(ResultCode.INTERNAL_ERROR);

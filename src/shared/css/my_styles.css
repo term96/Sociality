@@ -7,6 +7,15 @@
 }
 
 .avatar-preview {
-    width: 100%;
-    max-width: 256px;
+    min-width: 33.333333%;
+    max-width: 33.333333%;
+}
+
+.avatar-small {
+    width: 64px;
+    height: 64px;
+}
+
+.messages-list {
+    max-height: 60%;
 }

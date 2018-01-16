@@ -25,6 +25,7 @@ import SearchState from '../shared/states/SearchState';
 import FriendsState from '../shared/states/FriendsState';
 import Conversation from '../shared/models/Conversation';
 import ConversationsState from '../shared/states/ConversationsState';
+import Message from '../shared/models/Message';
 
 const app: express.Express = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -115,6 +116,62 @@ app.get('/api/conversations/:token', (req: express.Request, res: express.Respons
 
 	DB.getConversations(userId, (result: ResultCode, conversations: Conversation[]) => {
 		res.json(new ConversationsState(result, conversations));
+	});
+});
+
+app.get('/api/conversations/:id/:token', (req: express.Request, res: express.Response) => {
+	const userId: number = JWT.decodeId(req.params.token);
+	if (userId === undefined) {
+		return res.json(new ConversationsState(ResultCode.TOKEN_REQUIRED));
+	}
+
+	const limit: number = parseInt(req.query.limit, 10) || 50;
+	const oldest: number = parseInt(req.query.oldest, 10) || undefined;
+	const id: number = parseInt(req.params.id, 10);
+	if (!id) {
+		return res.json(new ConversationsState(ResultCode.INVALID_BODY));
+	}
+
+	DB.getMessages(id, oldest, limit, (result: ResultCode, messages: Message[]) => {
+		res.json(new ConversationsState(result, [new Conversation(id, undefined, messages)]));
+	});
+});
+
+app.post('/api/conversations/invite/:token', (req: express.Request, res: express.Response) => {
+	const userId: number = JWT.decodeId(req.params.token);
+	if (userId === undefined) {
+		return res.json(new ConversationsState(ResultCode.TOKEN_REQUIRED));
+	}
+
+	const conversationId: number = parseInt(req.body.conversationId, 10);
+	const id: number = parseInt(req.body.id, 10)
+
+	if (!id || !conversationId) {
+		return res.json(new ConversationsState(ResultCode.INVALID_BODY));
+	}
+
+	DB.addUserToConversation(id, conversationId, (result: ResultCode) => {
+		res.json(result);
+	});
+});
+
+app.post('/api/conversations/:id/:token', (req: express.Request, res: express.Response) => {
+	const userId: number = JWT.decodeId(req.params.token);
+	if (userId === undefined) {
+		return res.json(new ConversationsState(ResultCode.TOKEN_REQUIRED));
+	}
+
+	const id: number = parseInt(req.params.id, 10);
+	const text: string = req.body.text;
+	const time: number = parseInt(req.body.time, 10);
+	if (!id || !text || !time) {
+		return res.json(new ConversationsState(ResultCode.INVALID_BODY));
+	}
+
+	const message: Message = new Message(null, id, text, time, userId);
+
+	DB.addMessage(message, (result: ResultCode) => {
+		res.json(new ConversationsState(result));
 	});
 });
 

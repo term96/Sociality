@@ -11,6 +11,9 @@ import ConversationsList from './ConversationsList';
 import * as Button from 'react-bootstrap/lib/Button';
 import NewConversationModal from './NewConversationModal';
 import LoadingAlert from '../alerts/LoadingAlert';
+import * as Col from 'react-bootstrap/lib/Col';
+import Conversation from '../../models/Conversation';
+import Messages from './Messages';
 
 interface IConversationPageProps extends React.ClassAttributes<ConversationsPage> {
 	authState: AuthState;
@@ -22,6 +25,7 @@ interface IConversationPageProps extends React.ClassAttributes<ConversationsPage
 interface IConversationsPageState {
 	resultCode?: ResultCode;
 	showCreateModal?: boolean;
+	chosenConversation: number;
 }
 
 class ConversationsPage extends React.Component<IConversationPageProps, IConversationsPageState> {
@@ -29,12 +33,14 @@ class ConversationsPage extends React.Component<IConversationPageProps, IConvers
 		super(props);
 		this.state = {
 			resultCode: undefined,
-			showCreateModal: false
+			showCreateModal: false,
+			chosenConversation: undefined
 		};
 
 		this.createNewConversation = this.createNewConversation.bind(this);
 		this.onCreateClicked = this.onCreateClicked.bind(this);
 		this.onCreateModalHide = this.onCreateModalHide.bind(this);
+		this.onItemClick = this.onItemClick.bind(this);
 	}
 
 	componentDidMount(): void {
@@ -47,7 +53,13 @@ class ConversationsPage extends React.Component<IConversationPageProps, IConvers
 		const props: IConversationPageProps = this.props;
 		this.onCreateModalHide();
 		axios.post(`/api/conversations/create/${props.authState.token}`, { name: name })
-			.then((response: AxiosResponse) => {
+			.then(() => {
+				this.setState((prevState: IConversationsPageState) => {
+					return {
+						...prevState,
+						chosenConversation: undefined
+					};
+				});
 				props.resetConversations();
 				props.loadConversations(props.authState.token);
 			})
@@ -79,6 +91,15 @@ class ConversationsPage extends React.Component<IConversationPageProps, IConvers
 		});
 	}
 
+	onItemClick(conversationId: number): void {
+		this.setState((prevState: IConversationsPageState) => {
+			return {
+				...prevState,
+				chosenConversation: conversationId
+			};
+		});
+	}
+
 	render(): JSX.Element {
 		const props: IConversationPageProps = this.props;
 		const state: IConversationsPageState = this.state as IConversationsPageState;
@@ -87,6 +108,10 @@ class ConversationsPage extends React.Component<IConversationPageProps, IConvers
 			return <LoadingAlert />;
 		}
 
+		const messages: JSX.Element = (state.chosenConversation !== undefined)
+			? <Col sm={9}><Messages conversation={state.chosenConversation} /></Col>
+			: null;
+
 		return (
 			<div>
 				<NewConversationModal
@@ -94,8 +119,11 @@ class ConversationsPage extends React.Component<IConversationPageProps, IConvers
 					onSubmit={this.createNewConversation}
 					onHide={this.onCreateModalHide}
 				/>
-				<Button onClick={this.onCreateClicked}>Создать беседу</Button>
-				<ConversationsList conversationsState={props.conversationsState}/>
+				<Col sm={3}>
+					<Button onClick={this.onCreateClicked}>Создать беседу</Button>
+					<ConversationsList conversationsState={props.conversationsState} onClick={this.onItemClick}/>
+				</Col>
+				{messages}
 			</div>
 		);
 	}
