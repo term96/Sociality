@@ -102,22 +102,44 @@ export default class DB {
 	}
 
 	public static addUserToConversation(userId: number, id: number, callback: (result: ResultCode) => void): void {
+		DB.isUserInConversation(userId, id, (result: ResultCode) => {
+			if (result === ResultCode.OK) {
+				return callback(ResultCode.OK);
+			}
+			DB._pool.getConnection((err: Error, connection: mysql.PoolConnection) => {
+				if (err) {
+					callback(ResultCode.INTERNAL_ERROR);
+				}
+				const data: object = {
+					id: null,
+					id_conversation: id,
+					id_user: userId
+				};
+				const query: string = 'INSERT INTO conversation_user SET ?';
+				connection.query(query, data, (queryErr: mysql.MysqlError | null) => {
+					connection.release();
+					if (queryErr) {
+						callback(ResultCode.INTERNAL_ERROR);
+					}
+					callback(ResultCode.OK);
+				});
+			});
+		});
+	}
+
+	public static isUserInConversation(userId: number, id: number, callback: (result: ResultCode) => void): void {
 		DB._pool.getConnection((err: Error, connection: mysql.PoolConnection) => {
 			if (err) {
 				callback(ResultCode.INTERNAL_ERROR);
 			}
-			const data: object = {
-				id: null,
-				id_conversation: id,
-				id_user: userId
-			};
-			const query: string = 'INSERT INTO conversation_user SET ?';
-			connection.query(query, data, (queryErr: mysql.MysqlError | null) => {
+
+			const query: string = 'SELECT COUNT(*) AS count FROM conversation_user WHERE id_user = ? AND id_conversation = ?';
+			connection.query(query, [userId, id], (queryErr: mysql.MysqlError | null, queryResult: any) => {
 				connection.release();
 				if (queryErr) {
 					callback(ResultCode.INTERNAL_ERROR);
 				}
-				callback(ResultCode.OK);
+				callback((queryResult[0].count) > 0 ? ResultCode.OK : ResultCode.USER_NOT_FOUND);
 			});
 		});
 	}

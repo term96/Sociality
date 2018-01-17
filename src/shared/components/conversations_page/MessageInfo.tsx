@@ -18,7 +18,7 @@ export default class MessageInfo extends React.Component<IMessageInfoProps> {
 		const props: IMessageInfoProps = this.props;
 		const src: string = `/images/${props.message.senderAvatarPath}`;
 		const name: string = props.message.senderName;
-		const link: string = `/users/${props.message.senderId}`;
+		const link: string = `/user/${props.message.senderId}`;
 		const heading: JSX.Element = <Link to={link}>{name}</Link>;
 		const datetime: Date = new Date(props.message.time);
 		const time: string = datetime.toLocaleDateString() + ' ' + datetime.toLocaleTimeString();

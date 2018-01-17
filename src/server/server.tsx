@@ -144,7 +144,7 @@ app.post('/api/conversations/invite/:token', (req: express.Request, res: express
 	}
 
 	const conversationId: number = parseInt(req.body.conversationId, 10);
-	const id: number = parseInt(req.body.id, 10)
+	const id: number = parseInt(req.body.id, 10);
 
 	if (!id || !conversationId) {
 		return res.json(new ConversationsState(ResultCode.INVALID_BODY));
